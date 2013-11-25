@@ -10,7 +10,7 @@ class ContributorRoles {
 	public function __construct( $handle ) {
 		
 		ContributorRoles::$pagehook = add_submenu_page(
-			/* $parent_slug*/ $handle,
+			/* $parent_slug*/ 'podlove_settings_handle',
 			/* $page_title */ 'Contributor Roles',
 			/* $menu_title */ 'Contributor Roles',
 			/* $capability */ 'administrator',

@@ -50,6 +50,9 @@ class Podcast_Post_Type {
 
 		add_action( 'admin_menu', array( $this, 'create_menu' ) );
 		add_action( 'admin_menu', array( $this, 'create_support_menu_entry' ), 100 ); // make sure it's at the bottom
+
+		add_action( 'network_admin_menu', array( $this, 'create_network_menu' ) );
+
 		add_action( 'after_delete_post', array( $this, 'delete_trashed_episodes' ) );
 		add_filter( 'pre_get_posts', array( $this, 'enable_tag_and_category_search' ) );
 		add_filter( 'post_class', array( $this, 'add_post_class' ) );
@@ -203,6 +206,25 @@ class Podcast_Post_Type {
 		return $episode && strlen( $episode->summary ) > 0 ? $episode->summary : $excerpt;
 	}
 
+	public function create_network_menu() {
+
+		// create new top-level menu
+		$hook = add_menu_page(
+			/* $page_title */ 'Podlove Plugin Settings',
+			/* $menu_title */ 'Podlove',
+			/* $capability */ 'administrator',
+			/* $menu_slug  */ self::NETWORK_SETTINGS_PAGE_HANDLE,
+			/* $function   */ function () { /* see \Podlove\Settings\Dashboard */ }
+			/* $icon_url   */ //PLUGIN_URL . '/images/podlove/icon-adminmenu16-sprite_2x.png'
+			/* $position   */
+		);
+
+		new \Podlove\Settings\Network\Dashboard( self::NETWORK_SETTINGS_PAGE_HANDLE );
+		new \Podlove\Settings\Network\Network( self::NETWORK_SETTINGS_PAGE_HANDLE );
+		
+		do_action( 'podlove_register_settings_pages', self::NETWORK_SETTINGS_PAGE_HANDLE );
+	}
+
 	public function create_menu() {
 
 		// create new top-level menu
@@ -285,6 +307,7 @@ class Podcast_Post_Type {
 	}
 
 	const SETTINGS_PAGE_HANDLE = 'podlove_settings_handle';
+	const NETWORK_SETTINGS_PAGE_HANDLE = 'podlove_network_settings_handle';
 
 	public function add_new_podcast_columns($columns)
 	{

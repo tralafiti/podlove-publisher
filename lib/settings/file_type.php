@@ -117,7 +117,7 @@ class FileType {
 	private function view_template() {
 		?>
 		<h2>
-			<a href="?page=<?php echo $_REQUEST['page']; ?>&amp;podlove_tab=<?php echo $_REQUEST['podlove_tab'] ?>&amp;action=new" class="add-new-h2"><?php echo __( 'Add New', 'podlove' ); ?></a>
+			<a href="?page=<?php echo $_REQUEST['page']; ?>&amp;podlove_tab=file-types&amp;action=new" class="add-new-h2"><?php echo __( 'Add New', 'podlove' ); ?></a>
 		</h2>
 		<p>
 			<?php echo __( 'This is a list of all file types the publisher knows about. If you would like to serve assets of an unknown file type, you must add it here before you can create the asset.', 'podlove' ); ?>

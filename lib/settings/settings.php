@@ -29,6 +29,7 @@ class Settings {
 		$tabs->addTab( new Tab\FileTypes( __( 'File Types', 'podlove' ) ) );
 		$this->tabs = $tabs;
 		$this->tabs->initCurrentTab();
+
 	}
 	
 	function page() {
