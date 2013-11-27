@@ -301,3 +301,36 @@ function episode_license() {
 }
 add_shortcode( 'podlove-episode-license', '\Podlove\episode_license' );
 
+function latest_episodes() {
+	$latest_episodes = \Podlove\Model\Network::latest_episodes();
+
+	$source = " <table>
+				<thead>
+					<tr>
+						<th></th>
+						<th>Title</th>
+						<th>Date</th>
+						<th>Podcast</th>
+					</tr>
+				</thead>
+				<tbody>";
+
+	foreach ( $latest_episodes as $episode ) {
+		switch_to_blog( $episode['blog_id'] );
+		$podcast = \Podlove\Model\Podcast::get_instance();
+		$post = get_post( $episode['episode']->post_id ); 
+
+		$source = $source . "<tr>";
+		$source = $source . "<td><img src='" . $episode['episode']->get_cover_art_with_fallback() . "' alt='" . $episode['episode']->full_title() . "' style='width: 80px;' /></td>";
+		$source = $source . "<td>" . $episode['episode']->full_title() . "</td>";
+		$source = $source . "<td>" . $post->post_date . "</td>";
+		$source = $source . "<td>" . $podcast->title . "</td>";
+		$source = $source . "</tr>";
+	}
+
+	$source = $source . "</tbody></table>"; 
+
+	return $source;
+}
+add_shortcode( 'podlove-latest-network-episodes', '\Podlove\latest_episodes' );
+

@@ -90,14 +90,13 @@ class Dashboard {
 	}
 
 	public function network_overview() {
-		
 		global $wpdb;
-		$blog_ids = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
-		$podcasts = array();
-		
-		foreach ($blog_ids as $blog_id) {
+		$network = \Podlove\Model\Network::get_instance();
+		$podcasts = \Podlove\Model\Network::get_podcasts();
+		$statistics = \Podlove\Model\Network::get_statistics();
+
+		foreach ($podcasts as $blog_id => $podcast_data) {
 			switch_to_blog( $blog_id );
-			$podcast_data = \Podlove\Model\Podcast::get_instance();
 			$number_of_episodes = count( \Podlove\Model\Episode::all() );
 			$number_of_contributors = count( \Podlove\Modules\Contributors\Model\Contributor::all() );
 
@@ -108,14 +107,31 @@ class Dashboard {
 									"domain" => site_url(),
 									"cover" => $podcast_data->cover_image );
 
-			$podcasts[] = $podcast_entry;
+			$podcast_table_data[] = $podcast_entry;
+		}
+
+		// Looking for ordering options
+		if( isset( $_REQUEST['orderby'] ) && isset( $_REQUEST['order'] ) ) {
+			usort( $podcast_table_data, function ( $a, $b ) {
+				return strnatcmp( $a[ $_REQUEST['orderby'] ], $b[ $_REQUEST['orderby'] ] );
+			});
+			if( $_REQUEST['order'] == 'desc' ) {
+				krsort( $podcast_table_data );
+			}
 		}
 
 		$podcast_table = new PodcastNetworkTable();
-		$podcast_table->prepare_items( $podcasts ); 
+		$podcast_table->prepare_items( $podcast_table_data ); 
 
-		$podcast_table->display(); 
+		$title = ( !empty( $network->title ) ) ? "" : $network->title;
 
+		// Display Statistics
+		echo 	"Your Network <strong>" . $title . "</strong> consits of <strong>" .
+				$statistics['total_podcasts'] . "</strong> podcasts, which feature <strong>" . 
+				$statistics['total_episodes'] . "</strong> episodes where <strong>" .
+				$statistics['total_contributors'] . "</strong> contributors took part." ;
+
+		$podcast_table->display();
 	}
 }
 
@@ -135,9 +151,18 @@ class PodcastNetworkTable extends \WP_List_Table {
 	public function prepare_items( $podcasts ) {
 	  $columns = $this->get_columns();
 	  $hidden = array();
-	  $sortable = array();
+	  $sortable = $this->get_sortable_columns();
 	  $this->_column_headers = array($columns, $hidden, $sortable);
 	  $this->items = $podcasts;
+	}
+
+	public function get_sortable_columns() {
+		$sortable_columns = array(
+		    'title'  => array('title',false),
+		    'episodes' => array('episodes',false),
+		    'contributors'   => array('contributors',false)
+		  );
+		  return $sortable_columns;
 	}
 
 	public function column_default( $item, $column_name ) {
