@@ -1,5 +1,5 @@
 <?php
-namespace Podlove\Settings\Network;
+namespace Podlove\Modules\Networks\Settings;
 
 class Network {
 
@@ -32,7 +32,7 @@ class Network {
 				<?php settings_fields( Network::$pagehook ); ?>
 
 				<?php
-				$network = \Podlove\Model\Network::get_instance();
+				$network = \Podlove\Modules\Networks\Model\Network::get_instance();
 
 				$form_attributes = array(
 					'context'    => 'podlove_network',

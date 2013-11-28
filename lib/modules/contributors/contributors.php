@@ -22,7 +22,7 @@ class Contributors extends \Podlove\Modules\Base {
 		add_filter( 'parse_query', array($this, 'filter_by_contributor') );
 	
 		// register shortcodes
-		new Shortcodes;	
+		new Shortcodes;
 
 		// on settings screen, save per_page option
 		add_filter( "set-screen-option", function($status, $option, $value) {

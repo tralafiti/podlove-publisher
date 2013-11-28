@@ -1,5 +1,7 @@
-<?php
-namespace Podlove\Model;
+<?php 
+namespace Podlove\Modules\Networks\Model;
+
+use \Podlove\Model\Base;
 
 /**
  * Simplified Singleton model for network data.

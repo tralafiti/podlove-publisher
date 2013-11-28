@@ -1,5 +1,5 @@
 <?php
-namespace Podlove\Settings\Network;
+namespace Podlove\Modules\Networks\Settings;
 use \Podlove\Model;
 
 class Dashboard {
@@ -36,7 +36,7 @@ class Dashboard {
 
 	public static function settings_page() {
 		add_meta_box( Dashboard::$pagehook . '_about', __( 'About', 'podlove' ), '\Podlove\Settings\Dashboard::about_meta', Dashboard::$pagehook, 'side' );		
-		add_meta_box( Dashboard::$pagehook . '_network_overview', __( 'Podcast Network', 'podlove' ), '\Podlove\Settings\Network\Dashboard::network_overview', Dashboard::$pagehook, 'normal' );
+		add_meta_box( Dashboard::$pagehook . '_network_overview', __( 'Podcast Network', 'podlove' ), '\Podlove\Modules\Networks\Settings\Dashboard::network_overview', Dashboard::$pagehook, 'normal' );
 
 		do_action( 'podlove_network_dashboard_meta_boxes' );
 
@@ -91,9 +91,9 @@ class Dashboard {
 
 	public function network_overview() {
 		global $wpdb;
-		$network = \Podlove\Model\Network::get_instance();
-		$podcasts = \Podlove\Model\Network::get_podcasts();
-		$statistics = \Podlove\Model\Network::get_statistics();
+		$network = \Podlove\Modules\Networks\Model\Network::get_instance();
+		$podcasts = \Podlove\Modules\Networks\Model\Network::get_podcasts();
+		$statistics = \Podlove\Modules\Networks\Model\Network::get_statistics();
 
 		foreach ($podcasts as $blog_id => $podcast_data) {
 			switch_to_blog( $blog_id );
