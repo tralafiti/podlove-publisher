@@ -2,7 +2,6 @@
 namespace Podlove\Modules\Networks;
 
 use \Podlove\Model;
-use \Podlove\Modules\Contributors\Model\Contributor;
 use \Podlove\Modules\Networks\Model\Network;
 
 class Networks extends \Podlove\Modules\Base {
@@ -33,7 +32,7 @@ class Networks extends \Podlove\Modules\Base {
 			/* $capability */ 'administrator',
 			/* $menu_slug  */ \Podlove\Podcast_Post_Type::NETWORK_SETTINGS_PAGE_HANDLE,
 			/* $function   */ function () { /* see \Podlove\Settings\Dashboard */ }
-			/* $icon_url   */ //PLUGIN_URL . '/images/podlove/icon-adminmenu16-sprite_2x.png'
+			/* $icon_url   */ // \Podlove\PLUGIN_URL . '/images/podlove/icon-adminmenu16-sprite.png'
 			/* $position   */
 		);
 

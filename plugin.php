@@ -221,7 +221,7 @@ function custom_admin_icons() {
         /* PODLOVE SETTINGS ICON */
 
         /* Admin Menu - 16px */
-        #toplevel_page_podlove_settings_handle .wp-menu-image {
+        #toplevel_page_podlove_settings_handle .wp-menu-image, #toplevel_page_podlove_network_settings_handle .wp-menu-image {
             background: url(<?php echo \Podlove\PLUGIN_URL ?>/images/podlove/icon-adminmenu16-sprite.png) no-repeat 6px 6px !important;
         }
 		#toplevel_page_podlove_settings_handle:hover .wp-menu-image, #toplevel_page_podlove_settings_handle.wp-has-current-submenu .wp-menu-image {

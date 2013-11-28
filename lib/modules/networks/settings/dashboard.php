@@ -35,8 +35,9 @@ class Dashboard {
 	}
 
 	public static function settings_page() {
+		add_meta_box( Dashboard::$pagehook . '_right_now', __( 'Right now', 'podlove' ), '\Podlove\Modules\Networks\Settings\Dashboard::right_now', Dashboard::$pagehook, 'normal' );
 		add_meta_box( Dashboard::$pagehook . '_about', __( 'About', 'podlove' ), '\Podlove\Settings\Dashboard::about_meta', Dashboard::$pagehook, 'side' );		
-		add_meta_box( Dashboard::$pagehook . '_network_overview', __( 'Podcast Network', 'podlove' ), '\Podlove\Modules\Networks\Settings\Dashboard::network_overview', Dashboard::$pagehook, 'normal' );
+		add_meta_box( Dashboard::$pagehook . '_network_overview', __( 'Podcasts', 'podlove' ), '\Podlove\Modules\Networks\Settings\Dashboard::network_overview', Dashboard::$pagehook, 'normal' );
 
 		do_action( 'podlove_network_dashboard_meta_boxes' );
 
@@ -89,11 +90,22 @@ class Dashboard {
 		<?php
 	}
 
+	public function right_now() {
+		$statistics = \Podlove\Modules\Networks\Model\Network::get_statistics();
+		$network = \Podlove\Modules\Networks\Model\Network::get_instance();
+		$title = ( !empty( $network->title ) ) ? "" : $network->title;
+		echo 	"<p>Your Network <strong>" . $title . "</strong> consits of <strong>" .
+				$statistics['total_podcasts'] . "</strong> podcasts, which feature <strong>" . 
+				$statistics['total_episodes'] . "</strong> episodes where <strong>" .
+				$statistics['total_contributors'] . "</strong> contributors took part.</p>" ;
+
+		echo 	"<p>You are using <strong>Podlove Publisher " . \Podlove\get_plugin_header( 'Version' ) . "</strong>.</p>";
+	}
+
 	public function network_overview() {
 		global $wpdb;
 		$network = \Podlove\Modules\Networks\Model\Network::get_instance();
 		$podcasts = \Podlove\Modules\Networks\Model\Network::get_podcasts();
-		$statistics = \Podlove\Modules\Networks\Model\Network::get_statistics();
 
 		foreach ($podcasts as $blog_id => $podcast_data) {
 			switch_to_blog( $blog_id );
@@ -122,14 +134,6 @@ class Dashboard {
 
 		$podcast_table = new PodcastNetworkTable();
 		$podcast_table->prepare_items( $podcast_table_data ); 
-
-		$title = ( !empty( $network->title ) ) ? "" : $network->title;
-
-		// Display Statistics
-		echo 	"Your Network <strong>" . $title . "</strong> consits of <strong>" .
-				$statistics['total_podcasts'] . "</strong> podcasts, which feature <strong>" . 
-				$statistics['total_episodes'] . "</strong> episodes where <strong>" .
-				$statistics['total_contributors'] . "</strong> contributors took part." ;
 
 		$podcast_table->display();
 	}
