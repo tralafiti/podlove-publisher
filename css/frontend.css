@@ -117,3 +117,45 @@ div.podlove_cc_license {
   display: block;
   text-align: center;
 }
+
+ul.podlove_network_podcast_list {
+  list-style-type: none !important;
+  border-top: 1px solid #CCC;
+}
+
+ul.podlove_network_podcast_list li ul {
+  border-bottom: 1px solid #CCC;
+  list-style-type: none !important;
+}
+
+ul.podlove_network_podcast_list li ul li.cover {
+  width: 150px !important;
+  list-style-type: none !important;
+  display: inline-block;
+  float: right;
+}
+
+ul.podlove_network_podcast_list li ul li img {
+  width: 120px !important;
+  border: 1px solid #CCC;
+  padding: 5px;
+}
+
+ul.podlove_network_podcast_list li {
+  margin: 0px 0px 0px 0px !important;
+  padding: 0px 0px 0px 0px !important;
+  min-height: 100px;
+}
+
+ul.podlove_network_podcast_list li ul, ul.podlove_network_podcast_list li ul li {
+  margin: 0px 0px 0px 0px !important;
+  padding: 0.25em 0px 0.25em 0px !important;
+}
+
+
+
+
+
+
+
+
