@@ -200,9 +200,9 @@ class Network {
 	        $blog_table = esc_sql( $prefix . 'blogs' );
 
 	        $query .= "(SELECT $post_table.ID, $post_table.post_title, $post_table.post_date, $blog_table.blog_id FROM $post_table, $blog_table\n";
-	        $query .= "\tWHERE $post_table.post_type = 'podcast'\n";
-	        $query .= "\tAND $post_table.post_status = 'publish'\n";
-	        $query .= "\tAND $blog_table.blog_id = {$blog_id})\n";
+	        $query .= "WHERE $post_table.post_type = 'podcast'";
+	        $query .= "AND $post_table.post_status = 'publish'";
+	        $query .= "AND $blog_table.blog_id = {$blog_id})";
 
 	        if( $blog_id !== end($blog_ids) ) 
 	           $query .= "UNION\n";

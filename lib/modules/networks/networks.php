@@ -6,7 +6,7 @@ use \Podlove\Modules\Networks\Model\Network;
 
 class Networks extends \Podlove\Modules\Base {
 
-	protected $module_name = 'Network';
+	protected $module_name = 'Podcast Network';
 	protected $module_description = 'Support for Podcast Networks using <a href="http://codex.wordpress.org/Create_A_Network">WordPress Multisite</a> environments.';
 	protected $module_group = 'system';
 
