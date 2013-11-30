@@ -2,6 +2,7 @@
 namespace Podlove\Modules\Networks;
 
 use \Podlove\Model;
+use \Podlove\Modules\Networks\Model\Base;
 use \Podlove\Modules\Networks\Model\Network;
 
 class Networks extends \Podlove\Modules\Base {
@@ -11,12 +12,23 @@ class Networks extends \Podlove\Modules\Base {
 	protected $module_group = 'system';
 
 	public function load() {
+		// Actions after activation
+		add_action( 'podlove_module_was_activated_networks', array( $this, 'was_activated' ) );
+
 		// Adding Network Admin Menu
 		add_action( 'network_admin_menu', array( $this, 'create_network_menu' ) );
 
 		// Adding Shortcodes
-		add_shortcode( 'podlove-latest-network-episodes', array( $this, 'shortcode_latest_episodes' ) );
-		add_shortcode( 'podlove-network-podcasts', array( $this, 'shortcode_list_podcasts' ) );
+		//add_shortcode( 'podlove-latest-network-episodes', array( $this, 'shortcode_latest_episodes' ) );
+		//add_shortcode( 'podlove-network-podcasts', array( $this, 'shortcode_list_podcasts' ) );
+	}
+
+	/*
+	 *	Was activated
+	 */ 
+
+	public function was_activated( $module_name ) {
+		Network::build();
 	}
 
 	/*
@@ -37,7 +49,7 @@ class Networks extends \Podlove\Modules\Base {
 		);
 
 		new \Podlove\Modules\Networks\Settings\Dashboard( \Podlove\Podcast_Post_Type::NETWORK_SETTINGS_PAGE_HANDLE );
-		new \Podlove\Modules\Networks\Settings\Network( \Podlove\Podcast_Post_Type::NETWORK_SETTINGS_PAGE_HANDLE );
+		new \Podlove\Modules\Networks\Settings\Networks( \Podlove\Podcast_Post_Type::NETWORK_SETTINGS_PAGE_HANDLE );
 		
 		do_action( 'podlove_register_settings_pages', \Podlove\Podcast_Post_Type::NETWORK_SETTINGS_PAGE_HANDLE );
 	}
@@ -47,6 +59,7 @@ class Networks extends \Podlove\Modules\Base {
 	 */
 
 	public function shortcode_latest_episodes() {
+
 		$latest_episodes = \Podlove\Modules\Networks\Model\Network::latest_episodes();
 
 		$source = " <table>
@@ -79,6 +92,9 @@ class Networks extends \Podlove\Modules\Base {
 	}
 
 	public function shortcode_list_podcasts( $attributes ) {
+
+		print_r(Network::all());
+
 		$podcasts = \Podlove\Modules\Networks\Model\Network::get_podcasts();
 
 		$source = "<ul class='podlove_network_podcast_list'>";

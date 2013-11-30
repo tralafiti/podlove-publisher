@@ -119,7 +119,7 @@ abstract class Base
 	public static function count() {
 		global $wpdb;
 		
-		$sql = 'SELECT COUNT(*) FROM ' . self::table_name();
+		$sql = 'SELECT COUNT(*) FROM ' . static::table_name();
 		return (int) $wpdb->get_var( $sql );
 	}
 
@@ -130,7 +130,7 @@ abstract class Base
 		$model = new $class();
 		$model->flag_as_not_new();
 		
-		$row = $wpdb->get_row( 'SELECT * FROM ' . self::table_name() . ' WHERE id = ' . (int) $id );
+		$row = $wpdb->get_row( 'SELECT * FROM ' . static::table_name() . ' WHERE id = ' . (int) $id );
 		
 		if ( ! $row ) {
 			return NULL;
@@ -150,7 +150,7 @@ abstract class Base
 		$models = array();
 		
 		$rows = $wpdb->get_results(
-			'SELECT * FROM ' . self::table_name() . ' WHERE ' . $property .  ' = \'' . $value . '\''
+			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $property .  ' = \'' . $value . '\''
 		);
 		
 		if ( ! $rows ) {
@@ -177,7 +177,7 @@ abstract class Base
 		$model->flag_as_not_new();
 		
 		$row = $wpdb->get_row(
-			'SELECT * FROM ' . self::table_name() . ' WHERE ' . $property .  ' = \'' . $value . '\' LIMIT 0,1'
+			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $property .  ' = \'' . $value . '\' LIMIT 0,1'
 		);
 		
 		if ( ! $row ) {
@@ -198,7 +198,7 @@ abstract class Base
 		$models = array();
 		
 		$rows = $wpdb->get_results(
-			'SELECT * FROM ' . self::table_name() . ' WHERE ' . $where
+			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $where
 		);
 		
 		if ( ! $rows ) {
@@ -225,7 +225,7 @@ abstract class Base
 		$model->flag_as_not_new();
 		
 		$row = $wpdb->get_row(
-			'SELECT * FROM ' . self::table_name() . ' WHERE ' . $where . ' LIMIT 0,1'
+			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $where . ' LIMIT 0,1'
 		);
 		
 		if ( ! $row ) {
@@ -278,7 +278,7 @@ abstract class Base
 		$model = new $class();
 		$model->flag_as_not_new();
 		
-		$row = $wpdb->get_row( 'SELECT * FROM ' . self::table_name() . ' LIMIT 0,1' );
+		$row = $wpdb->get_row( 'SELECT * FROM ' . static::table_name() . ' LIMIT 0,1' );
 		
 		if ( ! $row ) {
 			return NULL;
@@ -298,7 +298,7 @@ abstract class Base
 		$model = new $class();
 		$model->flag_as_not_new();
 		
-		$row = $wpdb->get_row( 'SELECT * FROM ' . self::table_name() . ' ORDER BY id DESC LIMIT 0,1' );
+		$row = $wpdb->get_row( 'SELECT * FROM ' . static::table_name() . ' ORDER BY id DESC LIMIT 0,1' );
 		
 		if ( ! $row ) {
 			return NULL;
@@ -323,7 +323,7 @@ abstract class Base
 		$class = get_called_class();
 		$models = array();
 		
-		$rows = $wpdb->get_results( 'SELECT * FROM ' . self::table_name() . ' ' . $sql_suffix );
+		$rows = $wpdb->get_results( 'SELECT * FROM ' . static::table_name() . ' ' . $sql_suffix );
 		foreach ( $rows as $row ) {
 			$model = new $class();
 			$model->flag_as_not_new();
@@ -399,7 +399,7 @@ abstract class Base
 			$this->set_defaults();
 
 			$sql = 'INSERT INTO '
-			     . self::table_name()
+			     . static::table_name()
 			     . ' ( '
 			     . implode( ',', self::property_names() )
 			     . ' ) '
@@ -413,7 +413,7 @@ abstract class Base
 				$this->id = mysql_insert_id();
 			}
 		} else {
-			$sql = 'UPDATE ' . self::table_name()
+			$sql = 'UPDATE ' . static::table_name()
 			     . ' SET '
 			     . implode( ',', array_map( array( $this, 'property_name_to_sql_update_statement' ), self::property_names() ) )
 			     . ' WHERE id = ' . $this->id
@@ -460,7 +460,7 @@ abstract class Base
 		global $wpdb;
 		
 		$sql = 'DELETE FROM '
-		     . self::table_name()
+		     . static::table_name()
 		     . ' WHERE id = ' . $this->id;
 
 		return $wpdb->query( $sql );
@@ -500,7 +500,7 @@ abstract class Base
 			$property_sql[] = "`{$property['name']}` {$property['type']}";
 		
 		$sql = 'CREATE TABLE IF NOT EXISTS '
-		     . self::table_name()
+		     . static::table_name()
 		     . ' ('
 		     . implode( ',', $property_sql )
 		     . ' );'
@@ -521,13 +521,13 @@ abstract class Base
 	public static function build_indices() {
 		global $wpdb;
 
-		$indices_sql = 'SHOW INDEX FROM `' . self::table_name() . '`';
+		$indices_sql = 'SHOW INDEX FROM `' . static::table_name() . '`';
 		$indices = $wpdb->get_results( $indices_sql );
 		$index_columns = array_map( function($index){ return $index->Column_name; }, $indices );
 
 		foreach ( self::properties() as $property ) {
 			if ( ($property['name'] == 'id' || stripos( $property['name'], '_id' )) && ! in_array( $property['name'], $index_columns ) ) {
-				$sql = 'ALTER TABLE `' . self::table_name() . '` ADD INDEX `' . $property['name'] . '` (`' . $property['name'] . '`)';
+				$sql = 'ALTER TABLE `' . static::table_name() . '` ADD INDEX `' . $property['name'] . '` (`' . $property['name'] . '`)';
 				$wpdb->query( $sql );
 			}
 		}
@@ -559,11 +559,11 @@ abstract class Base
 	
 	public static function destroy() {
 		global $wpdb;
-		$wpdb->query( 'DROP TABLE ' . self::table_name() );
+		$wpdb->query( 'DROP TABLE ' . static::table_name() );
 	}
 
 	public static function delete_all() {
 	    global $wpdb;
-	    $wpdb->query( 'TRUNCATE ' . self::table_name() );  
+	    $wpdb->query( 'TRUNCATE ' . static::table_name() );  
 	}
 }

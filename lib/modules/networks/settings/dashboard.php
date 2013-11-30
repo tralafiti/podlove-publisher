@@ -1,6 +1,7 @@
 <?php
 namespace Podlove\Modules\Networks\Settings;
 use \Podlove\Model;
+use \Podlove\Modules\Networks\Model\Network;
 
 class Dashboard {
 
@@ -35,6 +36,7 @@ class Dashboard {
 	}
 
 	public static function settings_page() {
+
 		add_meta_box( Dashboard::$pagehook . '_right_now', __( 'Right now', 'podlove' ), '\Podlove\Modules\Networks\Settings\Dashboard::right_now', Dashboard::$pagehook, 'normal' );
 		add_meta_box( Dashboard::$pagehook . '_about', __( 'About', 'podlove' ), '\Podlove\Settings\Dashboard::about_meta', Dashboard::$pagehook, 'side' );		
 		add_meta_box( Dashboard::$pagehook . '_network_overview', __( 'Podcasts', 'podlove' ), '\Podlove\Modules\Networks\Settings\Dashboard::network_overview', Dashboard::$pagehook, 'normal' );
@@ -91,51 +93,11 @@ class Dashboard {
 	}
 
 	public function right_now() {
-		$statistics = \Podlove\Modules\Networks\Model\Network::get_statistics();
-		$network = \Podlove\Modules\Networks\Model\Network::get_instance();
-		$title = ( !empty( $network->title ) ) ? "" : $network->title;
-		echo 	"<p>Your Network <strong>" . $title . "</strong> consits of <strong>" .
-				$statistics['total_podcasts'] . "</strong> podcasts, which feature <strong>" . 
-				$statistics['total_episodes'] . "</strong> episodes where <strong>" .
-				$statistics['total_contributors'] . "</strong> contributors took part.</p>" ;
-
-		echo 	"<p>You are using <strong>Podlove Publisher " . \Podlove\get_plugin_header( 'Version' ) . "</strong>.</p>";
+		
 	}
 
 	public function network_overview() {
-		global $wpdb;
-		$network = \Podlove\Modules\Networks\Model\Network::get_instance();
-		$podcasts = \Podlove\Modules\Networks\Model\Network::get_podcasts();
-
-		foreach ($podcasts as $blog_id => $podcast_data) {
-			switch_to_blog( $blog_id );
-			$number_of_episodes = count( \Podlove\Model\Episode::all() );
-			$number_of_contributors = count( \Podlove\Modules\Contributors\Model\Contributor::all() );
-
-			$podcast_entry = array(	"ID" => $blog_id,
-									"title" => $podcast_data->title,
-									"episodes" => $number_of_episodes,
-									"contributors" => $number_of_contributors,
-									"domain" => site_url(),
-									"cover" => $podcast_data->cover_image );
-
-			$podcast_table_data[] = $podcast_entry;
-		}
-
-		// Looking for ordering options
-		if( isset( $_REQUEST['orderby'] ) && isset( $_REQUEST['order'] ) ) {
-			usort( $podcast_table_data, function ( $a, $b ) {
-				return strnatcmp( $a[ $_REQUEST['orderby'] ], $b[ $_REQUEST['orderby'] ] );
-			});
-			if( $_REQUEST['order'] == 'desc' ) {
-				krsort( $podcast_table_data );
-			}
-		}
-
-		$podcast_table = new PodcastNetworkTable();
-		$podcast_table->prepare_items( $podcast_table_data ); 
-
-		$podcast_table->display();
+		
 	}
 }
 
