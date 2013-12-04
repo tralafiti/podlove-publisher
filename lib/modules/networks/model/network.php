@@ -32,10 +32,25 @@ class Network extends Base {
 	}
 
 	/** 
-	*  Ftech Podcast
+	*  Fetch Podcasts by Network
 	*/
+	public static function fetch_podcasts_by_network( $network_id ) {
+		$network = self::find_by_id( $network_id );
+		if( !isset( $network ) ) 
+			return;
 
-	public static function get_podcast( $id ) {
+		$podcasts = array();
+		foreach ( explode( ',', $network->podcasts ) as $podcast ) {
+			switch_to_blog( $podcast );
+			$podcasts[ $podcast ] = \Podlove\Model\Podcast::get_instance();
+		}
+		return $podcasts;
+	}
+
+	/** 
+	*  Fetch Podcast by ID
+	*/
+	public static function fetch_podcast_by_id( $id ) {
 		switch_to_blog( $id );
 		return \Podlove\Model\Podcast::get_instance();
 	}
@@ -43,7 +58,7 @@ class Network extends Base {
 	/**
 	 * Fetch all Podcasts
 	 */
-	public static function get_all_blogs() {
+	public static function all_podcasts() {
 		global $wpdb;
 		return $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
 	}
@@ -51,8 +66,8 @@ class Network extends Base {
 	/**
 	 * Fetch all Podcasts ordered
 	 */
-	public static function get_all_podcasts_ordered( $sortby = "title", $sort = 'ASC' ) {
-		$blog_ids = static::get_all_blogs();
+	public static function all_podcasts_ordered( $sortby = "title", $sort = 'ASC' ) {
+		$blog_ids = static::all_podcasts();
 
 		foreach ($blog_ids as $blog_id) {
 			switch_to_blog( $blog_id );
@@ -68,6 +83,14 @@ class Network extends Base {
 		}
 
 		return $podcasts;	
+	}
+
+	/**
+	 * Fetch statistics for the network
+	 */
+	public static function statistics() {
+		$networks = count( self::all() );
+		
 	}
 
 }

@@ -178,7 +178,7 @@ class Networks {
 				'html' => array( 'class' => 'regular-text' )
 			) );
 
-			$podcasts = Network::get_all_podcasts_ordered();
+			$podcasts = Network::all_podcasts_ordered();
 			$podcasts_options_array = array();
 			foreach ( $podcasts as $blog_id => $podcast ) {
 				$podcasts_options_array[ $blog_id ] = $podcast->title;
