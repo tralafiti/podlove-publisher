@@ -6,6 +6,8 @@ use Podlove\Settings;
 use Podlove\Modules\Newsletter\Model\Subscription;
 use Podlove\Modules\Newsletter\Model\NewsletterVerification;
 
+use Podlove\Modules\Newsletter\Settings\NewsletterSettings;
+
 use Podlove\DomDocumentFragment;
 
 class Newsletter extends \Podlove\Modules\Base {
@@ -15,13 +17,39 @@ class Newsletter extends \Podlove\Modules\Base {
 	protected $module_group = 'web publishing';
 
 	public function load() {
+
 		// Activation hooks
 		add_action( 'podlove_module_was_activated_newsletter', array( $this, 'was_activated' ) );
 
 		// Send Email on Published Episode
 		add_action( 'publish_podcast', array( $this, 'send_newsletter' ) );
 
+		// register settings page
+		add_action( 'podlove_register_settings_pages', function( $settings_parent ) {
+			new \Podlove\Modules\Newsletter\Settings\NewsletterSettings( $settings_parent );
+		});
+
+		// Register Options
+		$this->register_option( 'newsletter_template_title', 'string', array(
+			'label'       => __( 'Subject', 'podlove' ),
+			'description' => 'The subject of the Newsletter E-mail.',
+			'html'        => array( 'class' => 'regular-text' )
+		) );
+
+		$this->register_option( 'newsletter_template_text', 'text', array(
+			'label'       => __( 'Text', 'podlove' ),
+			'description' => 'The text of the Newsletter E-mail.',
+			'html'        => array(
+				'cols' => '50',
+				'rows' => '4',
+				'class' => 'autogrow'
+			)
+		) );
 		
+	}
+
+	public function page() {
+
 	}
 
 	public function was_activated( $module_name ) {
