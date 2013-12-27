@@ -3,6 +3,8 @@ namespace Podlove\Modules\Newsletter;
 
 use Podlove\Settings;
 
+use Podlove\Modules\Newsletter\Shortcodes;
+
 use Podlove\Modules\Newsletter\Model\Subscription;
 use Podlove\Modules\Newsletter\Model\NewsletterVerification;
 
@@ -29,6 +31,12 @@ class Newsletter extends \Podlove\Modules\Base {
 			new \Podlove\Modules\Newsletter\Settings\NewsletterSettings( $settings_parent );
 		});
 
+		// Register Rewrite for subscription
+		add_action( 'wp', array( $this, 'fetch_verification' ) );  
+
+		// Add Shortcodes
+		new Shortcodes;
+
 		// Register Options
 		$this->register_option( 'newsletter_template_title', 'string', array(
 			'label'       => __( 'Subject', 'podlove' ),
@@ -46,6 +54,19 @@ class Newsletter extends \Podlove\Modules\Base {
 			)
 		) );
 		
+	}
+
+	public function subscribe() {
+		print_r($_POST);
+		if( isset( $_GET['podlove-newsletter-subscription'] ) && !empty( $_GET['podlove-newsletter-subscription'] ) ) {
+			
+		}	
+	}
+
+	public function fetch_verification() {
+		if( isset( $_GET['podlove-newsletter-verification'] ) && !empty( $_GET['podlove-newsletter-verification'] ) ) {
+			
+		}
 	}
 
 	public function page() {
