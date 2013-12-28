@@ -8,11 +8,13 @@ use Podlove\Modules\Newsletter\Shortcodes;
 use Podlove\Modules\Newsletter\Model\Subscription;
 use Podlove\Modules\Newsletter\Model\NewsletterVerification;
 
-use Podlove\Modules\Newsletter\Settings\NewsletterSettings;
+use Podlove\Modules\Newsletter\Settings\NewsletterSetting;
 
 use Podlove\DomDocumentFragment;
 
 class Newsletter extends \Podlove\Modules\Base {
+
+	static $pagehook;
 
 	protected $module_name = 'Newsletter';
 	protected $module_description = 'Allows users to subscribe to an E-mail Newsletter.';
@@ -28,7 +30,7 @@ class Newsletter extends \Podlove\Modules\Base {
 
 		// register settings page
 		add_action( 'podlove_register_settings_pages', function( $settings_parent ) {
-			new \Podlove\Modules\Newsletter\Settings\NewsletterSettings( $settings_parent );
+			new \Podlove\Modules\Newsletter\Settings\NewsletterSetting( $settings_parent );
 		});
 
 		// Fetch unsubscribe hash
@@ -222,6 +224,153 @@ class Newsletter extends \Podlove\Modules\Base {
 		return get_bloginfo('name');
 	}
 
+	/**
+	 * Singleton instance container.
+	 * @var \Podlove\Model\Podcast|NULL
+	 */
+	private static $instance = NULL;
+
+	/**
+	 * Contains property values.
+	 * @var  array
+	 */
+	public $data = array();
+
+	/**
+	 * Contains property names.
+	 * @var array
+	 */
+	protected $properties = array();
+
+	private $blog_id = NULL;
+
+	/**
+	 * Singleton.
+	 * 
+	 * @return \Podlove\Modules\Newsletter\Newsletter
+	 */
+	static public function get_instance() {
+
+		// whenever the blog is switched, we need to reload all podcast data
+		if ( ! isset( self::$instance ) || self::$instance->blog_id != get_current_blog_id() ) {
+
+			$properties = isset( self::$instance ) ? self::$instance->properties : false;
+			self::$instance = new self;
+			self::$instance->blog_id = get_current_blog_id();
+
+			// only take properties from preexisting instances
+			if ( $properties )
+				self::$instance->properties = $properties;
+		}
+
+		return self::$instance;
+	}
+
+	public function __construct() {
+		$this->data = array();
+		$this->fetch();
+	}
+	
+	private function set_property( $name, $value ) {
+		$this->data[ $name ] = $value;
+	}
+	
+	public function __get( $name ) {
+		if ( $this->has_property( $name ) ) {
+			return $this->get_property( $name );
+		} else {
+			return $this->$name;
+		}
+	}
+	
+	private function get_property( $name ) {
+		if ( isset( $this->data[ $name ] ) ) {
+			return $this->data[ $name ];
+		} else {
+			return NULL;
+		}
+	}
+
+	/**
+	 * Return a list of property dictionaries.
+	 * 
+	 * @return array property list
+	 */
+	private function properties() {
+		
+		if ( ! isset( $this->properties ) )
+			$this->properties = array();
+		
+		return $this->properties;
+	}
+	
+	/**
+	 * Does the given property exist?
+	 * 
+	 * @param string $name name of the property to test
+	 * @return bool True if the property exists, else false.
+	 */
+	public function has_property( $name ) {
+		return in_array( $name, $this->property_names() );
+	}
+	
+	/**
+	 * Return a list of property names.
+	 * 
+	 * @return array property names
+	 */
+	public function property_names() {
+		return array_map( function ( $p ) { return $p['name']; } , $this->properties );
+	}
+
+	/**
+	 * Define a property with by name.
+	 * 
+	 * @param string $name Name of the property / column
+	 */
+	public function property( $name ) {
+
+		if ( ! isset( $this->properties ) )
+			$this->properties = array();
+
+		array_push( $this->properties, array( 'name' => $name ) );
+	}
+
+	/**
+	 * Save current state to database.
+	 */
+	public function save() {
+
+		update_option( 'podlove_module_newsletter', $this->data );
+	}
+
+	/**
+	 * Load podcast data.
+	 */
+	private function fetch() {
+		$this->data = get_option( 'podlove_module_newsletter', array() );
+	}
+
+	public static function redirect( $action, $subscription_id = NULL ) {
+		$page   = 'admin.php?page=' . $_REQUEST['page'];
+		$show   = ( $subscription_id ) ? '&subscription=' . $subscription_id : '';
+		$action = '&action=' . $action;
+		
+		wp_redirect( admin_url( $page . $show . $action  ) );
+		exit;
+	}
+
 }
+
+$newsletter = Newsletter::get_instance();
+$newsletter->property( 'email' );
+$newsletter->property( 'announcementsubject' );
+$newsletter->property( 'announcementtext' );
+$newsletter->property( 'subscriptionsubject' );
+$newsletter->property( 'subscriptiontext' );
+$newsletter->property( 'verificationsubject' );
+$newsletter->property( 'verificationtext' );
+$newsletter->property( 'unsubscribesubject' );
+$newsletter->property( 'unsubscribetext' );
 
 ?>

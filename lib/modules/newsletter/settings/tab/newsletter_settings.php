@@ -1,9 +1,9 @@
 <?php 
-namespace Podlove\Modules\Contributors\Settings\Tab;
+namespace Podlove\Modules\Newsletter\Settings\Tab;
 use \Podlove\Settings\Settings;
 use \Podlove\Settings\Expert\Tab;
 
-class Groups extends Tab {
+class NewsletterSettings extends Tab {
 
 	public function init() {
 		$this->page_type = 'custom';
@@ -12,12 +12,12 @@ class Groups extends Tab {
 
 	public function register_page() {
 		$this->object = $this->getObject();
-		if( $_GET['page'] == 'podlove_contributor_settings' )
-			$this->object->page();
+		if( $_GET['page'] == 'podlove_newsletter_settings' )
+				$this->object->page();		
 	}
 
 	public function getObject() {
-		return new \Podlove\Modules\Contributors\Settings\ContributorGroups( 'podlove_contributor_settings' );
+		return new \Podlove\Modules\Newsletter\Settings\Settings( 'podlove_newsletter_settings' );
 	}
 
 }
