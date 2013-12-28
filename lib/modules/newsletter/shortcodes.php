@@ -15,13 +15,14 @@ class Shortcodes {
 
 	public function newsletter_form() {
 		$form = '';
+		$message = Newsletter::subscribe();
 
 		$form .= "	<form method=\"post\">
-						<input type=\"text\" id=\"podlove-newsletter-subscription-name\" name=\"podlove-newsletter-subscription-name\" />
 						<input type=\"text\" id=\"podlove-newsletter-subscription-email\" name=\"podlove-newsletter-subscription-email\" />
 						<input type=\"submit\" value=\"Subscribe\" />
 					</form>
 		";
+		echo "<em style='color: red'>" . $message . "</em>";
 
 		return $form;
 	}

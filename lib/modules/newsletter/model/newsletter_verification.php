@@ -9,7 +9,6 @@ class NewsletterVerification extends Base
 }
 
 NewsletterVerification::property( 'id', 'INT NOT NULL AUTO_INCREMENT PRIMARY KEY' );
-NewsletterVerification::property( 'name', 'TEXT' );
 NewsletterVerification::property( 'verification_hash', 'TEXT' );
 NewsletterVerification::property( 'email', 'TEXT' );
 NewsletterVerification::property( 'subscription_date', 'DATETIME' );
