@@ -34,6 +34,9 @@ class Newsletter extends \Podlove\Modules\Base {
 		// Fetch unsubscribe hash
 		add_action( 'wp', array( $this, 'unsubscribe' ) );
 
+		// Register cleaning schedule
+		add_action( 'podlove_module_newsletter_clean_verifications', array( $this, 'clean_verifications' ) );
+
 		// Add Shortcodes
 		new Shortcodes;
 
@@ -54,6 +57,20 @@ class Newsletter extends \Podlove\Modules\Base {
 			)
 		) );
 		
+	}
+
+	public function clean_verifications() {
+		$verifications = NewsletterVerification::all();
+
+		foreach ( $verifications as $verification_key => $verification ) {
+			$current_date = new \DateTime( current_time( 'mysql' ) );
+			$verification_date = new \DateTime( $verification->subscription_date );
+			$date_interval = date_diff( $verification_date, $current_date );
+
+			if( $date_interval->format('%d') >= '1' ) // Delete all subscription, which were not validated inner the 24h spectrum
+				$verification->delete();
+		}
+
 	}
 
 	public static function subscribe() {
@@ -179,6 +196,8 @@ class Newsletter extends \Podlove\Modules\Base {
 	public function was_activated( $module_name ) {
 		Subscription::build();
 		NewsletterVerification::build();
+
+		wp_schedule_event( time(), 'twicedaily', 'podlove_module_newsletter_clean_verifications' );
 	}
 
 	public function send_newsletter( $to, $subject, $text ) {
