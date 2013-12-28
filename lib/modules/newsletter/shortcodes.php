@@ -16,9 +16,9 @@ class Shortcodes {
 	public function newsletter_form() {
 		$form = '';
 
-		$form .= "	<form>
-						<input type=\"text\" id=\"podlove-newsletter-subscription-name\" />
-						<input type=\"text\" id=\"podlove-newsletter-subscription-email\" />
+		$form .= "	<form method=\"post\">
+						<input type=\"text\" id=\"podlove-newsletter-subscription-name\" name=\"podlove-newsletter-subscription-name\" />
+						<input type=\"text\" id=\"podlove-newsletter-subscription-email\" name=\"podlove-newsletter-subscription-email\" />
 						<input type=\"submit\" value=\"Subscribe\" />
 					</form>
 		";

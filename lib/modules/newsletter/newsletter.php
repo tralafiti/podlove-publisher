@@ -33,6 +33,7 @@ class Newsletter extends \Podlove\Modules\Base {
 
 		// Register Rewrite for subscription
 		add_action( 'wp', array( $this, 'fetch_verification' ) );  
+		add_action( 'wp', array( $this, 'subscribe' ) );  
 
 		// Add Shortcodes
 		new Shortcodes;
@@ -57,10 +58,23 @@ class Newsletter extends \Podlove\Modules\Base {
 	}
 
 	public function subscribe() {
-		print_r($_POST);
-		if( isset( $_GET['podlove-newsletter-subscription'] ) && !empty( $_GET['podlove-newsletter-subscription'] ) ) {
-			
+		$message = '';
+
+		if( isset( $_POST['podlove-newsletter-subscription-name'] ) &&
+			isset( $_POST['podlove-newsletter-subscription-email'] ) ) {
+
+			$subscription = new NewsletterVerification;
+			$subscription->name = $_POST['podlove-newsletter-subscription-name'];
+			$subscription->email = $_POST['podlove-newsletter-subscription-email'];
+			$subscription->IP = $_SERVER['REMOTE_ADDR'];
+			$subscription->verification_hash = uniqid();
+			$subscription->subscription_date = current_time( 'mysql' );
+
+			$subscription->save();
+
 		}	
+
+		return $message;
 	}
 
 	public function fetch_verification() {
