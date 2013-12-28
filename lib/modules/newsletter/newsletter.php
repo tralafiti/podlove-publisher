@@ -31,8 +31,8 @@ class Newsletter extends \Podlove\Modules\Base {
 			new \Podlove\Modules\Newsletter\Settings\NewsletterSettings( $settings_parent );
 		});
 
-		// Register Rewrite for subscription
-		add_action( 'wp', array( $this, 'fetch_verification' ) );
+		// Fetch unsubscribe hash
+		add_action( 'wp', array( $this, 'unsubscribe' ) );
 
 		// Add Shortcodes
 		new Shortcodes;
@@ -72,6 +72,7 @@ class Newsletter extends \Podlove\Modules\Base {
 			$user_ip = $_SERVER['REMOTE_ADDR'];
 			$user_email = $_POST['podlove-newsletter-subscription-email'];
 			$current_time = current_time( 'mysql' );
+			$current_address = $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
 
 			// Check for multiple subscriptions with one adress
 			$email_in_verification_process = NewsletterVerification::find_one_by_property('email', $user_email);
@@ -89,7 +90,7 @@ class Newsletter extends \Podlove\Modules\Base {
 			$ip_in_verification_process = NewsletterVerification::find_all_by_property('IP', $user_ip);
 			// After the current IP is used 10 times, we stop accepting new subscriptions from that IP adress for 1 day if the E-mail adresses are not verified.
 			if( is_array( $ip_in_verification_process ) && count( $ip_in_verification_process ) >= 100 )
-				return "You peformed subscription at least 100 times. Please verify the entered E-mail adresses first or wait 1 day until you add further adresses to the newsletter."; 
+				return "You peformed subscription at least 100 times. Please verify the entered E-mail adresses first or wait 1 day until you add further addresses to the newsletter."; 
 
 			// Check if already subscribed
 			$check_for_subscription = Subscription::find_one_by_property('email', $user_email);
@@ -105,13 +106,15 @@ class Newsletter extends \Podlove\Modules\Base {
 			$subscription->save();
 
 			// Prepare the verification E-mail
+			$verification_link = "http://" . $current_address . ( strpos($current_address, '?') ? "&amp;" : "?" ) ."podlove-newsletter-verification=" . $verification_hash;
 			$to = $_POST['podlove-newsletter-subscription-email'];
 			$subject = get_bloginfo('name') . " Newsletter: Please verify your subscription";
 			$text = "Hi there,<p>
 					 please verify your subsription to the " . get_bloginfo('name') . " Newsletter 
-					 by following that link: FOO.</p>
+					 by following that link: <a href='" . $verification_link . "' target='_blank'>
+					 " . $verification_link . "</a>.</p>
 					 If you did not subscribe to that newsletter please ask " . $_SERVER['REMOTE_ADDR'] 
-					 . "why that was done for you";
+					 . " why that was done for you.";
 
 			$email = new self;
 			$email->send_newsletter( $to, $subject, $text );
@@ -120,9 +123,56 @@ class Newsletter extends \Podlove\Modules\Base {
 		return $message;
 	}
 
-	public function fetch_verification() {
+	public static function verification() {
 		if( isset( $_GET['podlove-newsletter-verification'] ) && !empty( $_GET['podlove-newsletter-verification'] ) ) {
+
+			$blog_address = get_bloginfo('url');
+			$verification_hash = $_GET['podlove-newsletter-verification'];
 			
+			// Checking if hash can be used or was already used
+			$subscription = NewsletterVerification::find_one_by_property('verification_hash', $verification_hash);
+			if( !is_object( $subscription ) )
+				return 'Verification cannot be completed, as verification hash you are using was already used or is not valid anymore.';
+
+			$unsubscribe_hash = uniqid();
+
+			$verified_subscription = new Subscription;
+			$verified_subscription->email = $subscription->email;
+			$verified_subscription->subscription_date = $subscription->subscription_date;
+			$verified_subscription->unsubscribe_hash = $unsubscribe_hash;
+			$verified_subscription->save();
+
+			$subscription->delete();
+
+			$unsubscribe_link = $blog_address . ( strpos($blog_address, '?') ? "&amp;" : "?" ) ."podlove-newsletter-unsubscribe=" . $unsubscribe_hash;
+			$to = $subscription->email;
+			$subject = get_bloginfo('name') . " Newsletter: Your subscription";
+			$text = "Hi there,<p>
+					 You just subscribed to the " . get_bloginfo('name') . " Newsletter.
+					 </p>If you want to unsubscribe follow this link: <a href'" . $unsubscribe_link . "' target='_blank'>" . $unsubscribe_link . "</a>";
+
+			$email = new self;
+			$email->send_newsletter( $to, $subject, $text );
+
+			return "Success! You are now subscribed to the " . get_bloginfo('name') . " Newsletter.";
+
+		}
+	}
+
+	public function unsubscribe() {
+		if( isset( $_GET['podlove-newsletter-unsubscribe'] ) && !empty( $_GET['podlove-newsletter-unsubscribe'] ) ) {
+			$subscription = Subscription::find_one_by_property('unsubscribe_hash', $_GET['podlove-newsletter-unsubscribe']);
+			if( is_object( $subscription ) ) {
+				$to = $subscription->email;
+				$subject = get_bloginfo('name') . " Newsletter: Your subscription";
+				$text = "Hi there,<p>
+						 You just unsubscribed from the " . get_bloginfo('name') . " Newsletter. You will no longer receive Newsletter messages from the " . get_bloginfo('name') . " Podcast.";
+
+				$email = new self;
+				$email->send_newsletter( $to, $subject, $text );
+
+				$subscription->delete();
+			}
 		}
 	}
 
