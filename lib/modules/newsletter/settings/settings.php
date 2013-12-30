@@ -149,14 +149,17 @@ class Settings {
 					  		   ];
 
 			var episode_tags = [	"{linkedEpisodeTitle}",
-									"{EpisodeTitle}",
-									"{EpisodeSubtitle}",
-									"{EpisodeCover}",
-									"{EpisodeLink}",
-									"{EpisodeSummary}",
-									"{EpisodePlayer}",
-									"{EpisodeDuration}"
+									"{episodeTitle}",
+									"{episodeSubtitle}",
+									"{episodeCover}",
+									"{episodeLink}",
+									"{episodeSummary}",
+									"{episodePlayer}",
+									"{episodeDuration}",
+									"{unsubscribeLink}"
 					  		   ];
+
+			var action_tags = [ "{actionLink}" ];
 
 			function apply_CodeMirror(id, relation, linenumber, height) {
 
@@ -173,7 +176,7 @@ class Settings {
 						"'{'": function(cm) {
 							CodeMirror.simpleHint(cm, function(cm) {
 								return {
-									list: relation == 'episode' ? podcast_tags.concat(episode_tags) : podcast_tags,
+									list: relation == 'episode' ? podcast_tags.concat(episode_tags) : podcast_tags.concat(action_tags), // Either action link or Episode will be added
 									from: cm.getCursor()
 								};
 							});

@@ -130,14 +130,10 @@ class Newsletter extends \Podlove\Modules\Base {
 
 			// Prepare the verification E-mail
 			$verification_link = "http://" . $current_address . ( strpos($current_address, '?') ? "&amp;" : "?" ) ."podlove-newsletter-verification=" . $verification_hash;
+
 			$to = $_POST['podlove-newsletter-subscription-email'];
-			$subject = get_bloginfo('name') . " Newsletter: Please verify your subscription";
-			$text = "Hi there,<p>
-					 please verify your subsription to the " . get_bloginfo('name') . " Newsletter 
-					 by following that link: <a href='" . $verification_link . "' target='_blank'>
-					 " . $verification_link . "</a>.</p>
-					 If you did not subscribe to that newsletter please ask " . $_SERVER['REMOTE_ADDR'] 
-					 . " why that was done for you.";
+			$subject = self::prepare_email('subscriptionsubject');
+			$text = str_replace( '{actionLink}', '<a href="' . $verification_link . '">' . $verification_link . '</a>', self::prepare_email('subscriptiontext') );
 
 			$email = new self;
 			$email->send_newsletter( $to, $subject, $text );
@@ -169,10 +165,8 @@ class Newsletter extends \Podlove\Modules\Base {
 
 			$unsubscribe_link = $blog_address . ( strpos($blog_address, '?') ? "&amp;" : "?" ) ."podlove-newsletter-unsubscribe=" . $unsubscribe_hash;
 			$to = $subscription->email;
-			$subject = get_bloginfo('name') . " Newsletter: Your subscription";
-			$text = "Hi there,<p>
-					 You just subscribed to the " . get_bloginfo('name') . " Newsletter.
-					 </p>If you want to unsubscribe follow this link: <a href'" . $unsubscribe_link . "' target='_blank'>" . $unsubscribe_link . "</a>";
+			$subject = self::prepare_email('verificationsubject');
+			$text = str_replace( '{actionLink}', '<a href="' . $unsubscribe_link . '">' . $unsubscribe_link . '</a>', self::prepare_email('verificationtext') );
 
 			$email = new self;
 			$email->send_newsletter( $to, $subject, $text );
@@ -186,10 +180,10 @@ class Newsletter extends \Podlove\Modules\Base {
 		if( isset( $_GET['podlove-newsletter-unsubscribe'] ) && !empty( $_GET['podlove-newsletter-unsubscribe'] ) ) {
 			$subscription = Subscription::find_one_by_property('unsubscribe_hash', $_GET['podlove-newsletter-unsubscribe']);
 			if( is_object( $subscription ) ) {
+
 				$to = $subscription->email;
-				$subject = get_bloginfo('name') . " Newsletter: Your subscription";
-				$text = "Hi there,<p>
-						 You just unsubscribed from the " . get_bloginfo('name') . " Newsletter. You will no longer receive Newsletter messages from the " . get_bloginfo('name') . " Podcast.";
+				$subject = self::prepare_email('unsubscribesubject');
+				$text = self::prepare_email('unsubscribetext');
 
 				$email = new self;
 				$email->send_newsletter( $to, $subject, $text );
@@ -221,7 +215,7 @@ class Newsletter extends \Podlove\Modules\Base {
 	}
 
 	public function set_email_adress( $original_email_adress ) {
-		return 'newsletter@' . $_SERVER['HTTP_HOST'];
+		return self::prepare_email('email');
 	}
 
 	public function set_email_name( $original_email_name ) {
@@ -230,15 +224,17 @@ class Newsletter extends \Podlove\Modules\Base {
 
 	public static function prepare_email( $template, $post_id = FALSE ) {
 		$templates = \Podlove\Modules\Newsletter\Newsletter::get_instance();
-		return parent::replace_template_tags( $templates->template, $post_id );
+		return self::replace_template_tags( $templates->$template, $post_id );
 	}
 
 	public static function replace_template_tags( $source, $post_id = FALSE ) {
 
+		// Replace Podcast and Episode Tags. "actionLink" will be replaced elsewhere
+
 		$podcast = \Podlove\Model\Podcast::get_instance();
 
 		$replace = array(
-							'{podcastTitle}' => $podcast->full_title(),
+							'{podcastTitle}' => $podcast->title,
 							'{podcastSubtitle}' => $podcast->subtitle,
 							'{podcastSummary}' => $podcast->summary,
 							'{podcastCover}' => $podcast->cover_image
