@@ -39,6 +39,8 @@ class Newsletter extends \Podlove\Modules\Base {
 		// Register cleaning schedule
 		add_action( 'podlove_module_newsletter_clean_verifications', array( $this, 'clean_verifications' ) );
 
+		add_action( 'admin_init', array( $this, 'scripts_and_styles' ) );	
+
 		// Add Shortcodes
 		new Shortcodes;
 
@@ -50,6 +52,17 @@ class Newsletter extends \Podlove\Modules\Base {
 			return $status;
 		}, 10, 3 );
 		
+	}
+
+	public function scripts_and_styles() {
+
+		if ( ! isset( $_REQUEST['page'] ) )
+			return;
+
+		if ( $_REQUEST['page'] != 'podlove_newsletter_settings' )
+			return;
+
+		\Podlove\require_code_mirror();
 	}
 
 	public function clean_verifications() {

@@ -127,6 +127,77 @@ class Settings {
 				});
 				?>
 			</form>
+			<script type="text/javascript">
+
+			var subject_field_height = 30;
+			var text_field_height = 200;
+
+			// Apply CodeMirror on all template fields
+			apply_CodeMirror( 'podlove_module_newsletter_announcementsubject', 'episode', 0, subject_field_height );
+			apply_CodeMirror( 'podlove_module_newsletter_announcementtext', 'episode', 1, text_field_height );
+			apply_CodeMirror( 'podlove_module_newsletter_subscriptionsubject', '', 0, subject_field_height  );
+			apply_CodeMirror( 'podlove_module_newsletter_subscriptiontext', '', 1, text_field_height  );
+			apply_CodeMirror( 'podlove_module_newsletter_verificationsubject', '', 0, subject_field_height  );
+			apply_CodeMirror( 'podlove_module_newsletter_verificationtext', '', 1, text_field_height  );
+			apply_CodeMirror( 'podlove_module_newsletter_unsubscribesubject', '', 0, subject_field_height  );
+			apply_CodeMirror( 'podlove_module_newsletter_unsubscribetext', '', 1, text_field_height  );
+
+			var podcast_tags = [	"{podcastTitle}",
+									"{podcastSubtitle}",
+									"{podcastSummary}",
+									"{podcastCover}"
+					  		   ];
+
+			var episode_tags = [	"{linkedEpisodeTitle}",
+									"{EpisodeTitle}",
+									"{EpisodeSubtitle}",
+									"{EpisodeCover}",
+									"{EpisodeLink}",
+									"{EpisodeSummary}",
+									"{EpisodePlayer}",
+									"{EpisodeDuration}"
+					  		   ];
+
+			function apply_CodeMirror(id, relation, linenumber, height) {
+
+				var podlove_template_content = document.getElementById(id);
+				var podlove_template_editor = CodeMirror.fromTextArea(podlove_template_content, {
+					mode: "htmlmixed",
+					lineNumbers: linenumber,
+					theme: "default",
+					indentUnit: 4,
+					lineWrapping: true,
+					extraKeys: {
+						"'>'": function(cm) { cm.closeTag(cm, '>'); },
+						"'/'": function(cm) { cm.closeTag(cm, '/'); },
+						"'{'": function(cm) {
+							CodeMirror.simpleHint(cm, function(cm) {
+								return {
+									list: relation == 'episode' ? podcast_tags.concat(episode_tags) : podcast_tags,
+									from: cm.getCursor()
+								};
+							});
+						}
+					},
+					onCursorActivity: function() {
+						podlove_template_editor.matchHighlight("CodeMirror-matchhighlight");
+					}
+				});		
+
+				podlove_template_editor.setSize(null, height);
+			}
+			</script>
+			<style type="text/css">
+			span.CodeMirror-matchhighlight {
+				background: #e9e9e9;
+			}
+			.CodeMirror-focused span.CodeMirror-matchhighlight {
+				background: #e7e4ff; !important
+			}
+			.CodeMirror-scroll {
+				border: 1px solid #CCC;
+			}
+			</style>
 			<?php
 	}
 
