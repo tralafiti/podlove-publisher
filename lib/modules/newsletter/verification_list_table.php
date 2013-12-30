@@ -1,38 +1,43 @@
 <?php
 namespace Podlove\Modules\Newsletter;
 
-class Subscription_List_Table extends \Podlove\List_Table {
+class Verification_List_Table extends \Podlove\List_Table {
 	
 	function __construct(){
 		global $status, $page;
 		        
 		// Set parent defaults
 		parent::__construct( array(
-		    'singular'  => 'subscription',   // singular name of the listed records
-		    'plural'    => 'subscriptions',  // plural name of the listed records
+		    'singular'  => 'verification',   // singular name of the listed records
+		    'plural'    => 'verifications',  // plural name of the listed records
 		    'ajax'      => false       // does this table support ajax?
 		) );
 	}
 
-	public function column_email( $subscription ) {
+	public function column_email( $verification ) {
 		$actions = array(
-			'edit'   => Settings\Subscriptions::get_action_link( $subscription, __( 'Edit', 'podlove' ) ),
-			'delete' => Settings\Subscriptions::get_action_link( $subscription, __( 'Delete', 'podlove' ), 'confirm_delete' )
+			'edit'   => Settings\Verifications::get_action_link( $verification, __( 'Edit', 'podlove' ) ),
+			'delete' => Settings\Verifications::get_action_link( $verification, __( 'Delete', 'podlove' ), 'confirm_delete' )
 		);
 
 		return sprintf( '%s<br />%s',
-		    Settings\Subscriptions::get_action_link( $subscription, $subscription->email ),
+		    Settings\Verifications::get_action_link( $verification, $verification->email ),
 		    $this->row_actions( $actions )
-		) . '<input type="hidden" class="subscription_id" value="' . $subscription->id . '">';
+		) . '<input type="hidden" class="subscription_id" value="' . $verification->id . '">';
 	}
 
-	public function column_date( $subscription ) {
-		return $subscription->subscription_date;
+	public function column_date( $verification ) {
+		return $verification->subscription_date;
+	}
+
+	public function column_ip( $verification ) {
+		return $verification->ip;
 	}
 
 	public function get_columns(){
 		$columns = array(
 			'email'             => __( 'E-mail', 'podlove' ),
+			'ip'              => __( 'IP', 'podlove' ),
 			'date'              => __( 'Subscription Date', 'podlove' )
 		);
 		return $columns;
@@ -59,6 +64,7 @@ class Subscription_List_Table extends \Podlove\List_Table {
 	public function get_sortable_columns() {
 	  $sortable_columns = array(
 	    'email'                => array('email',true),
+	    'ip'                 => array('ip',false),
 	    'date'                 => array('subscription_date',false)
 	  );
 	  return $sortable_columns;
@@ -67,7 +73,7 @@ class Subscription_List_Table extends \Podlove\List_Table {
 	public function prepare_items() {
 
 		// number of items per page
-		$per_page = get_user_meta( get_current_user_id(), 'podlove_subscriptions_per_page', true);
+		$per_page = get_user_meta( get_current_user_id(), 'podlove_verifications_per_page', true);
 		if( empty($per_page) ) {
 			$per_page = 10;
 		}
@@ -94,14 +100,15 @@ class Subscription_List_Table extends \Podlove\List_Table {
 		
 		// retrieve data
 		if( !isset($_POST['s']) ) {
-			$data = \Podlove\Modules\Newsletter\Model\Subscription::all( $orderby . ' ' . $order );
+			$data = \Podlove\Modules\Newsletter\Model\NewsletterVerification::all( $orderby . ' ' . $order );
 		} else if ( empty($_POST['s']) ) {
-			$data = \Podlove\Modules\Newsletter\Model\Subscription::all( $orderby . ' ' . $order );
+			$data = \Podlove\Modules\Newsletter\Model\NewsletterVerification::all( $orderby . ' ' . $order );
 		} else {
 	 	 	$search   = $_POST['s'];
-			$data     = \Podlove\Modules\Newsletter\Model\Subscription::all(
+			$data     = \Podlove\Modules\Newsletter\Model\NewsletterVerification::all(
 				'WHERE 
 				`email` LIKE \'%' . $search . '%\' OR
+				`ip` LIKE \'%' . $search . '%\' OR
 				`subscription_date` LIKE \'%' . $search . '%\'
 				' . $orderby . ' ' . $order
 			);
@@ -128,7 +135,7 @@ class Subscription_List_Table extends \Podlove\List_Table {
 	}
 
 	function no_items() {
-		$url = sprintf( '?page=%s&podlove_tab=subscriptions&action=%s', $_REQUEST['page'], 'new' );
+		$url = sprintf( '?page=%s&podlove_tab=verifications&action=%s', $_REQUEST['page'], 'new' );
 		?>
 		<div style="margin: 20px 10px 10px 5px">
 	 		<span class="add-new-h2" style="background: transparent">

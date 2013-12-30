@@ -42,22 +42,13 @@ class Newsletter extends \Podlove\Modules\Base {
 		// Add Shortcodes
 		new Shortcodes;
 
-		// Register Options
-		$this->register_option( 'newsletter_template_title', 'string', array(
-			'label'       => __( 'Subject', 'podlove' ),
-			'description' => 'The subject of the Newsletter E-mail.',
-			'html'        => array( 'class' => 'regular-text' )
-		) );
-
-		$this->register_option( 'newsletter_template_text', 'text', array(
-			'label'       => __( 'Text', 'podlove' ),
-			'description' => 'The text of the Newsletter E-mail.',
-			'html'        => array(
-				'cols' => '50',
-				'rows' => '4',
-				'class' => 'autogrow'
-			)
-		) );
+		// on settings screen, save per_page option
+		add_filter( "set-screen-option", function($status, $option, $value) {
+			if ($option == 'podlove_subscriptions_per_page')
+				return $value;
+			
+			return $status;
+		}, 10, 3 );
 		
 	}
 

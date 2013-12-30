@@ -46,7 +46,7 @@ class Subscriptions {
 			<div class="updated">
 				<p>
 					<strong>
-						<?php echo sprintf( __( 'You selected to delete the subscription of "%s". Please confirm this action.', 'podlove' ), $subscription->title ) ?>
+						<?php echo sprintf( __( 'You selected to delete the subscription of "%s". Please confirm this action.', 'podlove' ), $subscription->email ) ?>
 					</strong>
 				</p>
 				<p>
@@ -93,8 +93,10 @@ class Subscriptions {
 	private function create() {
 		global $wpdb;
 		
-		$contributor = new \Podlove\Modules\Newsletter\Model\Subscription;
-		$contributor->update_attributes( $_POST['podlove_contributor_subscription'] );
+		$subscription = new \Podlove\Modules\Newsletter\Model\Subscription;
+		$subscription->subscription_date = current_time( 'mysql' );
+		$subscription->unsubscribe_hash = uniqid();
+		$subscription->update_attributes( $_POST['podlove_newsletter_subscription'] );
 
 		self::redirect( 'index' );
 	}
@@ -152,7 +154,7 @@ class Subscriptions {
 	private function form_template( $subscription, $action, $button_text = NULL ) {
 
 		$form_args = array(
-			'context' => 'podlove_contributor_subscription',
+			'context' => 'podlove_newsletter_subscription',
 			'hidden'  => array(
 				'subscription' => $subscription->id,
 				'action' => $action

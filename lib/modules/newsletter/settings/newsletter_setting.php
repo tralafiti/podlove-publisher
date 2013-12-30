@@ -23,6 +23,7 @@ class NewsletterSetting {
 		$tabs = new Tabs( __( 'Newsletter', 'podlove' ) );
 		$tabs->addTab( new \Podlove\Modules\Newsletter\Settings\Tab\NewsletterSettings( __( 'Settings', 'podlove' ), true ) );
 		$tabs->addTab( new \Podlove\Modules\Newsletter\Settings\Tab\Subscriptions( __( 'Subscriptions', 'podlove' ) ) );
+		$tabs->addTab( new \Podlove\Modules\Newsletter\Settings\Tab\Verifications( __( 'Verifications', 'podlove' ) ) );
 		$this->tabs = $tabs;
 		$this->tabs->initCurrentTab();
 
