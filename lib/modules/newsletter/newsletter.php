@@ -215,6 +215,47 @@ class Newsletter extends \Podlove\Modules\Base {
 		return get_bloginfo('name');
 	}
 
+	public static function prepare_email( $template, $post_id = FALSE ) {
+		$templates = \Podlove\Modules\Newsletter\Newsletter::get_instance();
+		return parent::replace_template_tags( $templates->template, $post_id );
+	}
+
+	public static function replace_template_tags( $source, $post_id = FALSE ) {
+
+		$podcast = \Podlove\Model\Podcast::get_instance();
+
+		$replace = array(
+							'{podcastTitle}' => $podcast->full_title(),
+							'{podcastSubtitle}' => $podcast->subtitle,
+							'{podcastSummary}' => $podcast->summary,
+							'{podcastCover}' => $podcast->cover_image
+					);
+
+		if( $post_id !== FALSE ) { // we can only replace placeholders if an episode is available
+
+			$episode = \Podlove\Model\Episode::find_one_by_post_id( $post_id );
+			$post = get_post( $post_id );
+
+			if( is_object( $episode ) )
+				$replace = array_merge(	
+								$replace,
+								array(
+									'{linkedEpisodeTitle}' => get_permalink( $post_id ),
+									'{episodeTitle}' => $post->post_title,
+									'{episodeCover}' => $episode->cover_art,
+									'{episodeLink}' => get_permalink( $post_id ),
+									'{episodeSubtitle}' => $episode->subtitle,
+									'{episodePlayer}' => 'foo',
+									'{episodeDuration}' => $episode->duration,
+									'{episodeSummary}' => $episode->summary
+								)
+						  );
+
+		}
+		
+		return strtr( $source, $replace );
+	}
+
 	/**
 	 * Singleton instance container.
 	 * @var \Podlove\Model\Podcast|NULL

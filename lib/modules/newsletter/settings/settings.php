@@ -22,6 +22,7 @@ class Settings {
 	}
 
 	public function page() {
+
 			?>
 			<form method="post">
 				<?php settings_fields( \Podlove\Modules\Newsletter\Newsletter::$pagehook ); ?>
