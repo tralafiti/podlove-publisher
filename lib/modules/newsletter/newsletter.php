@@ -44,14 +44,36 @@ class Newsletter extends \Podlove\Modules\Base {
 		// Add Shortcodes
 		new Shortcodes;
 
-		// on settings screen, save per_page option
-		add_filter( "set-screen-option", function($status, $option, $value) {
-			if ($option == 'podlove_subscriptions_per_page')
-				return $value;
-			
-			return $status;
+		// Import all posts as already published
+		add_filter( 'wp_import_post_meta', function($postmetas, $post_id, $post) {
+			$postmetas[] = array(
+				'key' => '_podlove_newsletter_was_send',
+				'value' => true
+			);
+			return $postmetas;
 		}, 10, 3 );
 		
+	}
+
+	public function send_newsletter() {
+		$post_id = $_POST['post_ID'];
+
+		if ( $this->is_already_published( $post_id ) )
+			return;
+
+		$subject = self::prepare_email('announcementsubject', $post_id);
+		$text = self::prepare_email('announcementtext', $post_id);
+		$subscriptions = \Podlove\Modules\Newsletter\Model\Subscription::all();
+
+		foreach ( $subscriptions as $subscription_key => $subscription ) {
+			self::send_mail( $subscription->email, $subject, $text );
+		}
+
+		update_post_meta( $post_id, '_podlove_newsletter_was_send', true );
+	}
+
+	private function is_already_published($post_id) {
+		return get_post_meta($post_id, '_podlove_newsletter_was_send', true);
 	}
 
 	public function scripts_and_styles() {
@@ -135,8 +157,7 @@ class Newsletter extends \Podlove\Modules\Base {
 			$subject = self::prepare_email('subscriptionsubject');
 			$text = str_replace( '{actionLink}', '<a href="' . $verification_link . '">' . $verification_link . '</a>', self::prepare_email('subscriptiontext') );
 
-			$email = new self;
-			$email->send_newsletter( $to, $subject, $text );
+			self::send_mail( $to, $subject, $text );
 		}
 
 		return $message;
@@ -168,8 +189,7 @@ class Newsletter extends \Podlove\Modules\Base {
 			$subject = self::prepare_email('verificationsubject');
 			$text = str_replace( '{actionLink}', '<a href="' . $unsubscribe_link . '">' . $unsubscribe_link . '</a>', self::prepare_email('verificationtext') );
 
-			$email = new self;
-			$email->send_newsletter( $to, $subject, $text );
+			self::send_mail( $to, $subject, $text );
 
 			return "Success! You are now subscribed to the " . get_bloginfo('name') . " Newsletter.";
 
@@ -185,8 +205,7 @@ class Newsletter extends \Podlove\Modules\Base {
 				$subject = self::prepare_email('unsubscribesubject');
 				$text = self::prepare_email('unsubscribetext');
 
-				$email = new self;
-				$email->send_newsletter( $to, $subject, $text );
+				self::send_mail( $to, $subject, $text );
 
 				$subscription->delete();
 			}
@@ -200,25 +219,25 @@ class Newsletter extends \Podlove\Modules\Base {
 		wp_schedule_event( time(), 'twicedaily', 'podlove_module_newsletter_clean_verifications' );
 	}
 
-	public function send_newsletter( $to, $subject, $text ) {
+	public static function send_mail( $to, $subject, $text ) {
 		// Set HTML Content Type
-		add_filter( 'wp_mail_content_type', array( $this, 'set_email_content_type' ) );
+		add_filter( 'wp_mail_content_type', array( '\Podlove\Modules\Newsletter\Newsletter', 'set_email_content_type' ) );
 		// Set newsletter@url / Podcastname as sender
-		add_filter( 'wp_mail_from', array( $this, 'set_email_adress' ) );
-		add_filter( 'wp_mail_from_name', array( $this, 'set_email_name' ) );
+		add_filter( 'wp_mail_from', array( '\Podlove\Modules\Newsletter\Newsletter', 'set_email_adress' ) );
+		add_filter( 'wp_mail_from_name', array( '\Podlove\Modules\Newsletter\Newsletter', 'set_email_name' ) );
 
 		wp_mail( $to, $subject, $text );
 	}
 
-	public function set_email_content_type( $original_email_contentype ) {
+	public static function set_email_content_type( $original_email_contentype ) {
 		return 'text/html';
 	}
 
-	public function set_email_adress( $original_email_adress ) {
+	public static function set_email_adress( $original_email_adress ) {
 		return self::prepare_email('email');
 	}
 
-	public function set_email_name( $original_email_name ) {
+	public static function set_email_name( $original_email_name ) {
 		return get_bloginfo('name');
 	}
 

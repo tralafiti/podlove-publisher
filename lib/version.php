@@ -519,6 +519,14 @@ function run_migrations_for_version( $version ) {
 				) );
 			}
 		break;
+		case 53:
+			$episodes = Model\Episode::all();
+			                        foreach ( $episodes as $episode ) {
+			                                $post = get_post( $episode->post_id );
+			                                if ( $post->post_status == 'publish' )
+			                                        update_post_meta( $episode->post_id, '_podlove_newsletter_was_send', true );
+			                        }
+		break;
 	}
 
 }
