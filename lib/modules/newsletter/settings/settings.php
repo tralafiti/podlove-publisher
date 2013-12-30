@@ -154,7 +154,6 @@ class Settings {
 									"{episodeCover}",
 									"{episodeLink}",
 									"{episodeSummary}",
-									"{episodePlayer}",
 									"{episodeDuration}",
 									"{unsubscribeLink}"
 					  		   ];

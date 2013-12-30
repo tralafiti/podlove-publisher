@@ -66,7 +66,13 @@ class Newsletter extends \Podlove\Modules\Base {
 		$subscriptions = \Podlove\Modules\Newsletter\Model\Subscription::all();
 
 		foreach ( $subscriptions as $subscription_key => $subscription ) {
-			self::send_mail( $subscription->email, $subject, $text );
+			$unsubscribe_link = get_bloginfo('url') . ( strpos($blog_address, '?') ? "&amp;" : "?" ) ."podlove-newsletter-unsubscribe=" . $subscription->unsubscribe_hash;
+
+			self::send_mail( 
+								$subscription->email, 
+								$subject, 
+								str_replace( '{unsubscribeLink}', '<a href="' . $unsubscribe_link . '">' . $unsubscribe_link . '</a>', $text )
+							);
 		}
 
 		update_post_meta( $post_id, '_podlove_newsletter_was_send', true );
@@ -270,10 +276,9 @@ class Newsletter extends \Podlove\Modules\Base {
 								array(
 									'{linkedEpisodeTitle}' => get_permalink( $post_id ),
 									'{episodeTitle}' => $post->post_title,
-									'{episodeCover}' => $episode->cover_art,
+									'{episodeCover}' => $episode->get_cover_art_with_fallback,
 									'{episodeLink}' => get_permalink( $post_id ),
 									'{episodeSubtitle}' => $episode->subtitle,
-									'{episodePlayer}' => 'foo',
 									'{episodeDuration}' => $episode->duration,
 									'{episodeSummary}' => $episode->summary
 								)
