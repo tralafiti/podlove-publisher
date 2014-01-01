@@ -103,12 +103,12 @@ class Verification_List_Table extends \Podlove\List_Table {
 		
 		// retrieve data
 		if( !isset($_POST['s']) ) {
-			$data = \Podlove\Modules\Newsletter\Model\NewsletterVerification::all( $orderby . ' ' . $order );
+			$data = \Podlove\Modules\Newsletter\Model\Verification::all( $orderby . ' ' . $order );
 		} else if ( empty($_POST['s']) ) {
-			$data = \Podlove\Modules\Newsletter\Model\NewsletterVerification::all( $orderby . ' ' . $order );
+			$data = \Podlove\Modules\Newsletter\Model\Verification::all( $orderby . ' ' . $order );
 		} else {
 	 	 	$search   = $_POST['s'];
-			$data     = \Podlove\Modules\Newsletter\Model\NewsletterVerification::all(
+			$data     = \Podlove\Modules\Newsletter\Model\Verification::all(
 				'WHERE 
 				`email` LIKE \'%' . $search . '%\' OR
 				`ip` LIKE \'%' . $search . '%\' OR
