@@ -228,7 +228,6 @@ class Newsletter extends \Podlove\Modules\Base {
 	public static function send_mail( $to, $subject, $text ) {
 		// Set HTML Content Type
 		add_filter( 'wp_mail_content_type', array( '\Podlove\Modules\Newsletter\Newsletter', 'set_email_content_type' ) );
-		// Set newsletter@url / Podcastname as sender
 		add_filter( 'wp_mail_from', array( '\Podlove\Modules\Newsletter\Newsletter', 'set_email_adress' ) );
 		add_filter( 'wp_mail_from_name', array( '\Podlove\Modules\Newsletter\Newsletter', 'set_email_name' ) );
 
@@ -262,7 +261,7 @@ class Newsletter extends \Podlove\Modules\Base {
 							'{podcastTitle}' => $podcast->title,
 							'{podcastSubtitle}' => $podcast->subtitle,
 							'{podcastSummary}' => $podcast->summary,
-							'{podcastCover}' => $podcast->cover_image
+							'{podcastCover}' => '<img src="' . $podcast->cover_image . '" alt="' . $podcast->title . '" />'
 					);
 
 		if( $post_id !== FALSE ) { // we can only replace placeholders if an episode is available
@@ -274,13 +273,14 @@ class Newsletter extends \Podlove\Modules\Base {
 				$replace = array_merge(	
 								$replace,
 								array(
-									'{linkedEpisodeTitle}' => get_permalink( $post_id ),
+									'{linkedEpisodeTitle}' => '<a href="' . get_permalink( $post_id ) . '" title="' . $post->post_title . '">' . $post->post_title . '</a>',
 									'{episodeTitle}' => $post->post_title,
-									'{episodeCover}' => $episode->get_cover_art_with_fallback,
+									'{episodeCover}' => '<img src="' . $episode->get_cover_art_with_fallback() . '" alt="' . $post->post_title . '" />',
 									'{episodeLink}' => get_permalink( $post_id ),
 									'{episodeSubtitle}' => $episode->subtitle,
 									'{episodeDuration}' => $episode->duration,
 									'{episodeSummary}' => $episode->summary
+									// {actionLink} and {unsubscribelink} are prepared for each individual case
 								)
 						  );
 

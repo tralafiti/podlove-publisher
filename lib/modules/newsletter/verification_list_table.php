@@ -31,6 +31,9 @@ class Verification_List_Table extends \Podlove\List_Table {
 	}
 
 	public function column_ip( $verification ) {
+		if ( $verification->ip == '' )
+			return '-';
+		
 		return $verification->ip;
 	}
 

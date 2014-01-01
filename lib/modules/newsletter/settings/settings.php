@@ -40,13 +40,21 @@ class Settings {
 					$newsletter = $form->object;
 
 					$wrapper->subheader(
+						__( 'Description', 'podlove' ),
+						__( 'The Newsletter module allows your listeners to subscribe to a Newsletter which announces new Episodes.
+							 The process of subscription and the way the send E-mails will look, can be directly influenced
+							 by using the templates below. For modification a list of all tags is listed in Podlove documentation.
+							 ', 'podlove' )
+					);
+
+					$wrapper->subheader(
 						__( 'General', 'podlove' ),
 						__( '', 'podlove' )
 					);
 
 					$wrapper->string( 'email', array(
 						'label'       => __( 'E-mail', 'podlove' ),
-						'description' => __( 'This E-mail address will appear.', 'podlove' ),
+						'description' => __( 'This will be the sender E-mail address. Make shure the address has always the format of something@yourdomain.com', 'podlove' ),
 						'html' => array( 'class' => 'regular-text' )
 					) );
 
