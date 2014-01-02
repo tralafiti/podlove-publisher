@@ -27,7 +27,7 @@ class NewsletterSetting {
 		$this->tabs = $tabs;
 		$this->tabs->initCurrentTab();
 
-		foreach ($this->tabs->getTabs() as $tab) {
+		foreach ( $this->tabs->getTabs() as $tab) {
 			add_action( 'admin_init', array( $tab->getObject(), 'process_form' ) );
 		}
 	}

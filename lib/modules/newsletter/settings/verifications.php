@@ -41,7 +41,7 @@ class Verifications {
 
 	public function page() {
 		if ( isset($_GET["action"]) AND $_GET["action"] == 'confirm_delete' AND isset( $_REQUEST['verification'] ) ) {
-			 $verification = \Podlove\Modules\Newsletter\Model\NewsletterVerification::find_by_id( $_REQUEST['verification'] );
+			 $verification = \Podlove\Modules\Newsletter\Model\Verification::find_by_id( $_REQUEST['verification'] );
 			?>
 			<div class="updated">
 				<p>
@@ -81,7 +81,7 @@ class Verifications {
 		if ( ! isset( $_REQUEST['verification'] ) )
 			return;
 			
-		$verification = \Podlove\Modules\Newsletter\Model\NewsletterVerification::find_by_id( $_REQUEST['verification'] );
+		$verification = \Podlove\Modules\Newsletter\Model\Verification::find_by_id( $_REQUEST['verification'] );
 		$verification->update_attributes( $_POST['podlove_newsletter_verification'] );
 		
 		self::redirect( 'index', $verification->id );
@@ -93,7 +93,7 @@ class Verifications {
 	private function create() {
 		global $wpdb;
 		
-		$verification = new \Podlove\Modules\Newsletter\Model\NewsletterVerification;
+		$verification = new \Podlove\Modules\Newsletter\Model\Verification;
 		$verification->subscription_date = current_time( 'mysql' );
 		// leave IP blank, as the admin added the user
 		$verification->verification_hash = uniqid();
@@ -109,7 +109,7 @@ class Verifications {
 		if ( ! isset( $_REQUEST['verification'] ) )
 			return;
 
-		\Podlove\Modules\Newsletter\Model\NewsletterVerification::find_by_id( $_REQUEST['verification'] )->delete();
+		\Podlove\Modules\Newsletter\Model\Verification::find_by_id( $_REQUEST['verification'] )->delete();
 		
 		self::redirect( 'index' );
 	}
@@ -139,7 +139,7 @@ class Verifications {
 	}
 	
 	private function new_template() {
-		$verification = new \Podlove\Modules\Newsletter\Model\NewsletterVerification;
+		$verification = new \Podlove\Modules\Newsletter\Model\Verification;
 		?>
 		<h3><?php echo __( 'Add New verification', 'podlove' ); ?></h3>
 		<?php
@@ -147,7 +147,7 @@ class Verifications {
 	}
 	
 	private function edit_template() {
-		$verification = \Podlove\Modules\Newsletter\Model\NewsletterVerification::find_by_id( $_REQUEST['verification'] );
+		$verification = \Podlove\Modules\Newsletter\Model\Verification::find_by_id( $_REQUEST['verification'] );
 		echo '<h3>' . sprintf( __( 'Edit verification: %s', 'podlove' ), $verification->title ) . '</h3>';
 		$this->form_template( $verification, 'save' );
 	}

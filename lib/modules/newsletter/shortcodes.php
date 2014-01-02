@@ -23,7 +23,13 @@ class Shortcodes {
 						<input type=\"submit\" value=\"Subscribe\" />
 					</form>
 		";
-		echo "<em style='color: red'>" . $subscription_message . $verification_message . "</em>";
+
+		if( !empty( $subscription_message ) || !empty( $verification_message ) )
+			echo "<script type='text/javascript'> 
+					jQuery( document ).ready( function() { 
+						PODLOVE.dialog_box(" . $subscription_message . $verification_message .");
+					});
+				</script>";
 
 		return $form;
 	}

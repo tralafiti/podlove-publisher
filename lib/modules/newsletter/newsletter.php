@@ -40,6 +40,9 @@ class Newsletter extends \Podlove\Modules\Base {
 		// Fetch unsubscribe hash
 		add_action( 'wp', array( $this, 'unsubscribe' ) );
 
+		// Add Dialog boxes for subscription
+		add_action( 'wp', array( $this, 'dialog_boxes' ) );
+
 		// Add Shortcodes
 		new Shortcodes;
 
@@ -220,11 +223,11 @@ class Newsletter extends \Podlove\Modules\Base {
 		if( isset( $_POST['podlove-newsletter-subscription-email'] ) ) {  // Without $_POST fields, there is no activity
 
 			if( empty( $_POST['podlove-newsletter-subscription-email'] ) )
-				return "Please fill in an E-mail adress!"; // Without an E-mail adress we cannot continue
+				return "'red', 'Please fill in an E-mail adress!'"; // Without an E-mail adress we cannot continue
 
-			if( strpos( $_POST['podlove-newsletter-subscription-email'], '@' ) === FALSE || 
+			if( strpos( $_POST['podlove-newsletter-subscription-email'], '@' ) === FALSE ||
 				strpos( $_POST['podlove-newsletter-subscription-email'], '.' ) === FALSE )
-				return "Please fill in a valid E-mail adress!"; // As it is an email there should be at last one @ and on .
+				return "'red', 'Please fill in a valid E-mail adress!'"; // As it is an email there should be at last one @ and on .
 
 			$verification_hash = uniqid();
 			$user_ip = $_SERVER['REMOTE_ADDR'];
@@ -240,20 +243,19 @@ class Newsletter extends \Podlove\Modules\Base {
 				$subscription_interval = date_diff( $last_subscription, $current_time_object );
 
 				if( $subscription_interval->format('%h') < '1' && $subscription_interval->format('%i') < '30' ) // Time limit for new subscription is 30min
-					return "You already subscribed to the Newsletter, but you still need to verify your E-mail adress. If you lost this E-mail please try subscription again 
-							in 30min.";
+					return "'yellow', 'You already subscribed to the Newsletter, but you still need to verify your E-mail adress. If you lost this E-mail please try subscription again in 30min.'";
 			}
 
 			// Check for SPAM!
 			$ip_in_verification_process = Verification::find_all_by_property('IP', $user_ip);
 			// After the current IP is used 10 times, we stop accepting new subscriptions from that IP adress for 1 day if the E-mail adresses are not verified.
 			if( is_array( $ip_in_verification_process ) && count( $ip_in_verification_process ) >= 100 )
-				return "You peformed subscription at least 100 times. Please verify the entered E-mail adresses first or wait 1 day until you add further addresses to the newsletter."; 
+				return "'red', 'You peformed subscription at least 100 times. Please verify the entered E-mail adresses first or wait 1 day until you add further addresses to the newsletter.'"; 
 
 			// Check if already subscribed
 			$check_for_subscription = Subscription::find_one_by_property('email', $user_email);
 			if( is_object( $check_for_subscription ) )
-				return "You already subscribed to the newsletter!";
+				return "'red', 'You already subscribed to the newsletter!'";
 
 			// Add a new subscription to the database. This still needs to be verified within 48h
 			$subscription = new Verification;
@@ -271,6 +273,8 @@ class Newsletter extends \Podlove\Modules\Base {
 			$text = str_replace( '{actionLink}', '<a href="' . $verification_link . '">' . $verification_link . '</a>', self::prepare_email('subscriptiontext') );
 
 			self::send_mail( $to, $subject, $text );
+
+			return "'yellow', 'To complete your subscription, please check your inbox and follow the instructions to verify your E-mail address.'";
 		}
 
 		return $message;
@@ -285,7 +289,7 @@ class Newsletter extends \Podlove\Modules\Base {
 			// Checking if hash can be used or was already used
 			$subscription = Verification::find_one_by_property('verification_hash', $verification_hash);
 			if( !is_object( $subscription ) )
-				return 'Verification cannot be completed, as verification hash you are using was already used or is not valid anymore.';
+				return "'red', 'Verification cannot be completed, as verification hash you are using was already used or is not valid anymore.'";
 
 			$unsubscribe_hash = uniqid();
 
@@ -304,7 +308,7 @@ class Newsletter extends \Podlove\Modules\Base {
 
 			self::send_mail( $to, $subject, $text );
 
-			return "Success! You are now subscribed to the " . get_bloginfo('name') . " Newsletter.";
+			return "'green', 'Success! You are now subscribed to the " . get_bloginfo('name') . " Newsletter.'";
 
 		}
 	}
@@ -321,8 +325,18 @@ class Newsletter extends \Podlove\Modules\Base {
 				self::send_mail( $to, $subject, $text );
 
 				$subscription->delete();
+
+				add_action( 'wp_head', array( $this, 'unsubscribe_message' ) );
 			}
 		}
+	}
+
+	public function unsubscribe_message() {
+		echo "<script type='text/javascript'> 
+					jQuery( document ).ready( function() { 
+						PODLOVE.dialog_box('green', 'You unsubscribed from the " . get_bloginfo('name') . " Newsletter.');
+					});
+				</script>";
 	}
 
 	/**
@@ -442,6 +456,13 @@ class Newsletter extends \Podlove\Modules\Base {
 			return;
 
 		\Podlove\require_code_mirror();
+	}
+
+	public function dialog_boxes() {
+		wp_register_script( 'podlove-newsletter-dialog-script', \Podlove\PLUGIN_URL . '/lib/modules/newsletter/js/dialog.js', array( 'jquery-ui-autocomplete' ) );
+		wp_enqueue_script( 'podlove-newsletter-dialog-script' );
+		wp_register_style( 'podlove-newsletter-dialog-style', \Podlove\PLUGIN_URL . '/lib/modules/newsletter/css/dialog.css' );
+		wp_enqueue_style( 'podlove-newsletter-dialog-style' );
 	}
 
 }
