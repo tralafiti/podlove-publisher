@@ -17,14 +17,16 @@ class Season_List_Table extends \Podlove\List_Table {
 
 	public function column_number( $season ) {
 		$actions = array(
-			'edit'   => Settings\Seasons::get_action_link( $season, __( 'Edit', 'podlove' ) ),
-			'delete' => Settings\Seasons::get_action_link( $season, __( 'Delete', 'podlove' ), 'confirm_delete' )
+			'edit'   => Settings\Seasons::get_action_link( $season, __( 'Edit', 'podlove' ) ),	
 		);
+
+		if( $season->number !== '1' )
+			$actions['delete'] = Settings\Seasons::get_action_link( $season, __( 'Delete', 'podlove' ), 'confirm_delete' );
 	
 		return sprintf( '%1$s %2$s',
 		    Settings\Seasons::get_action_link( $season, $season->number ),
 		    $this->row_actions( $actions )
-		) . '<input type="hidden" class="season_id" value="' . $season->id . '">';;
+		) . '<input type="hidden" class="season_id" value="' . $season->id . '">';
 	}
 
 	public function column_mnemonic( $season ) {
@@ -55,7 +57,7 @@ class Season_List_Table extends \Podlove\List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		
 		// retrieve data
-		$data = \Podlove\Modules\EpisodeNumbering\Model\Season::all( 'ORDER BY number DESC' );
+		$data = \Podlove\Modules\EpisodeNumbering\Model\Season::all( 'ORDER BY number ASC' );
 		
 		// get current page
 		$current_page = $this->get_pagenum();

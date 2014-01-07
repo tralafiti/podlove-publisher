@@ -31,6 +31,11 @@ class Episode_Numbering extends \Podlove\Modules\Base {
     public function was_activated( $module_name )
     {
     	Season::build();
+
+        // Builld Season 1
+        $season1 = new \Podlove\Modules\EpisodeNumbering\Model\Season;
+        $season1->number = '1';
+        $season1->save();
     }
 
     public function episode_form_extension( $wrapper )

@@ -113,13 +113,14 @@ class Seasons {
 	public function page() {
 
 		$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : NULL;
+		$season = \Podlove\Modules\EpisodeNumbering\Model\Season::find_by_id( $_REQUEST['season'] );
 
 		if ( $action == 'confirm_delete' && isset( $_REQUEST['season'] ) ) {
 			?>
 			<div class="updated">
 				<p>
 					<strong>
-						<?php echo __( 'Are you sure you want do delete this season?', 'podlove' ) ?>
+						<?php echo sprintf( __( 'Are you sure you want to delete season %s?', 'podlove' ), $season->number ) ?>
 					</strong>
 				</p>
 				<p>
@@ -174,14 +175,16 @@ class Seasons {
 			)
 		);
 
-		\Podlove\Form\build_for( $season, $form_args, function ( $form ) {
+		\Podlove\Form\build_for( $season, $form_args, function ( $form ) use ( $season ) {
 			$f = new \Podlove\Form\Input\TableWrapper( $form );
 
-			$f->string( 'number', array(
-				'label'       => __( 'Number', 'podlove' ),
-				'description' => __( '', 'podlove' ),
-				'html' => array( 'class' => 'regular-text required' )
-			) );
+			if( $season->number !== '1' ) {
+				$f->number( 'number', array(
+					'label'       => __( 'Number', 'podlove' ),
+					'description' => __( '', 'podlove' ),
+					'html' => array( 'class' => 'regular-text required' )
+				) );
+			}
 
 			$f->string( 'mnemonic', array(
 				'label'       => __( 'Mnemonic', 'podlove' ),
@@ -201,7 +204,7 @@ class Seasons {
 	
 	private function edit_season() {
 		$season = \Podlove\Modules\EpisodeNumbering\Model\Season::find_by_id( $_REQUEST['season'] );
-		echo '<h3>' . sprintf( __( 'Edit Season: %s', 'podlove' ), $season->title ) . '</h3>';
+		echo '<h3>' . sprintf( __( 'Edit Season: %s', 'podlove' ), $season->number ) . '</h3>';
 		$this->form_season( $season, 'save' );
 	}
 

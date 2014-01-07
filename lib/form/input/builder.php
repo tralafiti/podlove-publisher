@@ -87,6 +87,15 @@ class Builder {
 		<?php
 	}
 
+	public function number( $object_key, $arguments ) {
+		$this->build_input_values( $object_key, $arguments );
+		?>
+		<div>
+			<input type="number" name="<?php echo $this->field_name; ?>" id="<?php echo $this->field_id; ?>" value="<?php echo esc_attr( $this->field_value ); ?>" <?php echo $this->html_attributes; ?>>
+		</div>
+		<?php
+	}
+
 	public function hidden( $object_key, $arguments ) {
 		$this->build_input_values( $object_key, $arguments );
 		?>
