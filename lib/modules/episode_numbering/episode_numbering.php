@@ -32,9 +32,12 @@ class Episode_Numbering extends \Podlove\Modules\Base {
 
     public function save_post_meta( $post_id )
     {
-        update_post_meta( $post_id, '_podlove_meta_podlove_episode_season', $_POST['_podlove_meta']['_podlove_episode_season'] );
-        update_post_meta( $post_id, '_podlove_meta_podlove_episode_number', $_POST['_podlove_meta']['_podlove_episode_number'] );
-        update_post_meta( $post_id, '_podlove_meta_podlove_episode_global_number', $_POST['_podlove_meta']['_podlove_episode_global_number'] );
+        if( isset( $_POST['_podlove_meta'] ) )
+        {
+            update_post_meta( $post_id, '_podlove_meta_podlove_episode_season', $_POST['_podlove_meta']['_podlove_episode_season'] );
+            update_post_meta( $post_id, '_podlove_meta_podlove_episode_number', $_POST['_podlove_meta']['_podlove_episode_number'] );
+            update_post_meta( $post_id, '_podlove_meta_podlove_episode_global_number', $_POST['_podlove_meta']['_podlove_episode_global_number'] );
+        }
     }
 
     public function was_activated( $module_name )
@@ -149,7 +152,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                                 var episode_number = $("#_podlove_meta_podlove_episode_number").val();
                                 var episode_season = season_number;
 
-                                if( episode_global_number !== '' ) {
+                                if( episode_global_number !== '' && podcast_mnemonic !== '' ) {
                                     $(".podlove-global-number").html( podcast_mnemonic + PODLOVE.fill_string_left( episode_global_number, 3 ) );
                                 } else {
                                     $(".podlove-global-number").html('');
@@ -161,7 +164,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                                      $(".podlove-season-number").html('');
                                 }
 
-                                if( episode_number !== '' ) {
+                                if( episode_number !== '' && season_mnemonic !== '' ) {
                                     $(".podlove-season-mnemonic").html( season_mnemonic + PODLOVE.fill_string_left( episode_number, 2 ) );
                                  } else {
                                     $(".podlove-season-mnemonic").html('');

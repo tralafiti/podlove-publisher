@@ -113,7 +113,9 @@ class Seasons {
 	public function page() {
 
 		$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : NULL;
-		$season = \Podlove\Modules\EpisodeNumbering\Model\Season::find_by_id( $_REQUEST['season'] );
+
+		if( isset( $_REQUEST['season'] ) )
+			$season = \Podlove\Modules\EpisodeNumbering\Model\Season::find_by_id( $_REQUEST['season'] );
 
 		if ( $action == 'confirm_delete' && isset( $_REQUEST['season'] ) ) {
 			?>
