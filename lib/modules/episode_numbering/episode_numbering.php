@@ -55,8 +55,21 @@ class Episode_Numbering extends \Podlove\Modules\Base {
             'callback'  => function() {
 
                 $seasons = array_reverse( \Podlove\Modules\EpisodeNumbering\Model\Season::all() );
+                $episodes = \Podlove\Model\Episode::all();
 
                 $post_id = get_the_ID();
+
+                // Unset all Episodes that are drafts
+                foreach ( $episodes as $episode_key => $episode ) {
+                    $episode_status = get_post( $episode->post_id )->post_status;
+                    if ( $episode_status == 'auto-draft' || 
+                         $episode_status == 'inherit' ||
+                         $episode_status == 'trash' )
+                        unset( $episodes[$episode_key] );
+                }
+
+                // The global episode number is the number of episodes + 1!
+                $number_of_episodes = count( $episodes ) + 1; 
 
                 $season_id = get_post_meta( $post_id, '_podlove_meta_podlove_episode_season', true );
                 $episode_number = get_post_meta( $post_id, '_podlove_meta_podlove_episode_number', true );
@@ -70,6 +83,10 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                             margin-right: 2%;
                         }
                     </style>
+
+                    <script type="text/javascript">
+
+                    </script>
 
                     <div class="podlove-episode-numbering-item">
                         <label for="_podlove_meta_podlove_episode_season">Season</label>
@@ -92,7 +109,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
 
                     <div class="podlove-episode-numbering-item">
                         <label for="_podlove_meta_podlove_episode_global_number">Global Episode Number</label>
-                        <input type="text" name="_podlove_meta[_podlove_episode_global_number]" id="_podlove_meta_podlove_episode_global_number" value="<?php echo $global_episode_number; ?>" >
+                        <input type="text" name="_podlove_meta[_podlove_episode_global_number]" id="_podlove_meta_podlove_episode_global_number" value="<?php echo ( $global_episode_number == '' ? $number_of_episodes : $global_episode_number ); ?>" >
                     </div>
                 <?php
             }
