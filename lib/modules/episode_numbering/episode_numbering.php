@@ -142,11 +142,12 @@ class Episode_Numbering extends \Podlove\Modules\Base {
 
                                 $("select#_podlove_meta_podlove_episode_season option:selected").each(function() {
                                     season_mnemonic = $(this).data('mnemonic');
+                                    season_number = $(this).data('number')
                                 });
 
                                 var episode_global_number = $("#_podlove_meta_podlove_episode_global_number").val();
                                 var episode_number = $("#_podlove_meta_podlove_episode_number").val();
-                                var episode_season = $("#_podlove_meta_podlove_episode_season").val();
+                                var episode_season = season_number;
 
                                 if( episode_global_number !== '' ) {
                                     $(".podlove-global-number").html( podcast_mnemonic + PODLOVE.fill_string_left( episode_global_number, 3 ) );
@@ -192,10 +193,11 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                         <select name="_podlove_meta[_podlove_episode_season]" id="_podlove_meta_podlove_episode_season" class="chosen" >
                             <?php
                                 foreach ( $seasons as $season_key => $season ) {
-                                   printf( '<option value="%s"%s data-mnemonic="%s">%s</option>',
+                                   printf( '<option value="%s"%s data-mnemonic="%s" data-number="%s">%s</option>',
                                             $season->id,
                                             $season_id == $season->id ? ' selected' : '',
                                             $season->mnemonic,
+                                            $season->number,
                                             $season->number ); 
                                 }
                             ?>
