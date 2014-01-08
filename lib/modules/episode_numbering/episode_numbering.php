@@ -77,7 +77,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                         unset( $episodes[$episode_key] );
                     } else 
                     {
-                        if ( $season_id == $current_season_id )
+                        if ( $current_season_id == get_post_meta( $episode->post_id, '_podlove_meta_podlove_episode_season', true ) )
                             $current_season_episode_counter++;
                     }
                 }
