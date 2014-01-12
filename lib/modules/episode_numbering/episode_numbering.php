@@ -14,13 +14,15 @@ class Episode_Numbering extends \Podlove\Modules\Base {
     public function load()
     {
     	add_action( 'podlove_module_was_activated_episode_numbering', array( $this, 'was_activated' ) );
+        add_action( 'admin_print_styles', array( $this, 'scripts_and_styles' ) );
 
         add_action( 'save_post', array( $this, 'save_post_meta' ) );
 
+        // Register Form Extensions
     	add_action( 'podlove_podcast_form', array( $this, 'podcast_form_extension' ), 10, 2 );
     	add_action( 'podlove_episode_form', array( $this, 'episode_form_extension' ), 10, 2 );
 
-    	// register settings page
+    	// Register settings page
     	add_action( 'podlove_register_settings_pages', function( $settings_parent ) {
     		new Settings\Seasons( $settings_parent );
     	});
@@ -44,7 +46,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
     {
     	Season::build();
 
-        // Builld Season 1
+        // Add Season 1. This season will always exist and cannot be deleted.
         $season1 = new \Podlove\Modules\EpisodeNumbering\Model\Season;
         $season1->number = '1';
         $season1->save();
@@ -53,7 +55,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
     public function episode_form_extension( $wrapper )
     {
     	$wrapper->callback( '_podlove_episode_season', array(
-    		'label'    => __( 'Numbering', 'podlove' ),
+    		'label'    => __( 'Indexing', 'podlove' ),
     		'description' => __( 'Used to call episodes by their global episode number.' ),
             'callback'  => function() {
 
@@ -89,106 +91,8 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                 $number_of_episodes = count( $episodes ) + 1; 
 
                 ?>
-                    <style type="text/css">
-                        .podlove-episode-numbering-item {
-                            display: inline-block;
-                            margin-right: 2%;
-                            line-height: 26px;
-                        }
-                        .podlove-global-number, .podlove-season-number, .podlove-season-mnemonic {
-                            font-family: Consolas;
-                            background-color: #E7E7E7;
-                            margin: 0px 2px 0px 2px;
-                        }
-                        #podlove-episode-numbering-preview {
-                            margin-top: 15px;
-                        }
-                        .podlove-episode-numbering-item input, .podlove-episode-numbering-item select {
-                            width: 50px;
-                            display: inline-block;
-                            height: 26px;
-                        }
-                        .podlove-episode-numbering-item label {
-                            display: inline-block;
-                            margin-right: 10px;
-                        }
-                        .podlove-episode-numbering-item.episode_number {
-                            width: 170px !important;
-                        }
-                        .podlove-episode-numbering-item.episode_season {
-                            width: 150px !important;
-                        }
-                        .podlove-episode-numbering-item.episode_global_number {
-                            width: 250px !important;
-                        }
-                    </style>
-
                     <script type="text/javascript">
-                        var PODLOVE = PODLOVE || {};
                         var podcast_mnemonic = "<?php echo $podcast->mnemonic; ?>";
-                        var season_mnemonic = "";
-
-                        PODLOVE.fill_string_left = function( number, length, fill ) {
-                            number = number.toString();
-                            
-                            if ( !fill ) { fill = '0'; } // found @ http://stv.whtly.com/2009/02/27/simple-jquery-string-padding-function/
-                            
-                            while ( number.length < length ) {
-                                number = fill + number;
-                            }
-
-                            return number;
-                        }
-                        
-                        PODLOVE.episode_numbering_preview = function() {
-                            (function($) {
-
-                                $("select#_podlove_meta_podlove_episode_season option:selected").each(function() {
-                                    season_mnemonic = $(this).data('mnemonic');
-                                    season_number = $(this).data('number')
-                                });
-
-                                var episode_global_number = $("#_podlove_meta_podlove_episode_global_number").val();
-                                var episode_number = $("#_podlove_meta_podlove_episode_number").val();
-                                var episode_season = season_number;
-
-                                if( episode_global_number !== '' && podcast_mnemonic !== '' ) {
-                                    $(".podlove-global-number").html( podcast_mnemonic + PODLOVE.fill_string_left( episode_global_number, 3 ) );
-                                } else {
-                                    $(".podlove-global-number").html('');
-                                }
-
-                                if( episode_number !== '' ) {
-                                    $(".podlove-season-number").html( "S" + PODLOVE.fill_string_left( episode_season, 2 ) + "E" + PODLOVE.fill_string_left( episode_number, 2 ) );
-                                } else {
-                                     $(".podlove-season-number").html('');
-                                }
-
-                                if( episode_number !== '' && season_mnemonic !== '' ) {
-                                    $(".podlove-season-mnemonic").html( season_mnemonic + PODLOVE.fill_string_left( episode_number, 2 ) );
-                                 } else {
-                                    $(".podlove-season-mnemonic").html('');
-                                }
-
-                            }(jQuery));
-                        }
-
-                        jQuery(document).ready(function() {
-                            PODLOVE.episode_numbering_preview();
-
-                            jQuery("#_podlove_meta_podlove_episode_season").change(function() {
-                                 PODLOVE.episode_numbering_preview();
-                            });
-
-                            jQuery("#_podlove_meta_podlove_episode_number").change(function() {
-                                 PODLOVE.episode_numbering_preview();
-                            });
-
-                            jQuery("#_podlove_meta_podlove_episode_global_number").change(function() {
-                                 PODLOVE.episode_numbering_preview();
-                            });
-                        });
-
                     </script>
 
                     <div class="podlove-episode-numbering-item">
@@ -218,7 +122,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                     </div>
 
                     <div id="podlove-episode-numbering-preview">
-                        This Episode will be numbered as:
+                        This Episode will be indexed as:
                         <span class="podlove-global-number"></span>
                         <span class="podlove-season-number"></span>
                         <span class="podlove-season-mnemonic"></span>
@@ -235,4 +139,13 @@ class Episode_Numbering extends \Podlove\Modules\Base {
 			'description' => __( 'Used to call episodes by their global episode number.' )
 		) );
 	}
+
+    public function scripts_and_styles() {
+        wp_register_script( 'podlove-episode-numbering-admin-script', \Podlove\PLUGIN_URL . '/lib/modules/episode_numbering/js/admin.js', array( 'jquery-ui-autocomplete' ) );
+        wp_enqueue_script( 'podlove-episode-numbering-admin-script' );
+
+        wp_register_style( 'podlove-episode-numbering-admin-style',  \Podlove\PLUGIN_URL . '/lib/modules/episode_numbering/css/admin.css', false, \Podlove\get_plugin_header( 'Version' ) );
+        wp_enqueue_style('podlove-episode-numbering-admin-style');
+    }
+
 }

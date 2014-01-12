@@ -46,7 +46,7 @@ class Seasons {
 	}
 
 	/**
-	 * Process form: save/update a format
+	 * Process form: save/update a season
 	 */
 	private function save() {
 		if ( ! isset( $_REQUEST['season'] ) )
@@ -59,7 +59,7 @@ class Seasons {
 	}
 	
 	/**
-	 * Process form: create a format
+	 * Process form: create a season
 	 */
 	private function create() {
 		global $wpdb;
@@ -71,7 +71,7 @@ class Seasons {
 	}
 	
 	/**
-	 * Process form: delete a format
+	 * Process form: delete a season
 	 */
 	private function delete() {
 		if ( ! isset( $_REQUEST['season'] ) )
@@ -150,7 +150,7 @@ class Seasons {
 
 	private function view_season() {
 
-		echo __( 'DESCRIPTION' );
+		echo __( 'Season can help to organize your episodes.' );
 
 		$table = new \Podlove\Modules\EpisodeNumbering\Season_List_Table();
 		$table->prepare_items();
@@ -196,13 +196,13 @@ class Seasons {
 
 			$f->text( 'description', array(
 				'label'       => __( 'Description', 'podlove' ),
-				'description' => __( '', 'podlove' )
+				'description' => __( '', 'podlove' ),
+				'html'		  => array( 'rows' => 3, 'cols' => 40, 'class' => 'autogrow' )
 			) );
 
 		});
 
 	}
-
 	
 	private function edit_season() {
 		$season = \Podlove\Modules\EpisodeNumbering\Model\Season::find_by_id( $_REQUEST['season'] );

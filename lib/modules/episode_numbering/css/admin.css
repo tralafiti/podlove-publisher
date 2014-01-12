@@ -1,0 +1,40 @@
+.podlove-episode-numbering-item {
+    display: inline-block;
+    margin-right: 2%;
+    line-height: 26px;
+}
+
+.podlove-global-number, 
+.podlove-season-number, 
+.podlove-season-mnemonic {
+    font-family: Consolas;
+    background-color: #E7E7E7;
+    margin: 0px 2px 0px 2px;
+}
+
+#podlove-episode-numbering-preview {
+    margin-top: 15px;
+}
+
+.podlove-episode-numbering-item input, .podlove-episode-numbering-item select {
+    width: 50px;
+    display: inline-block;
+    height: 26px;
+}
+
+.podlove-episode-numbering-item label {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.podlove-episode-numbering-item.episode_number {
+    width: 170px !important;
+}
+
+.podlove-episode-numbering-item.episode_season {
+    width: 150px !important;
+}
+
+.podlove-episode-numbering-item.episode_global_number {
+    width: 250px !important;
+}
