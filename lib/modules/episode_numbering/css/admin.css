@@ -38,3 +38,15 @@
 .podlove-episode-numbering-item.episode_global_number {
     width: 250px !important;
 }
+
+.podlove-episode-numbering-table-cover {
+    width: 45px;
+}
+
+.manage-column.column-cover {
+    width: 50px;
+}
+
+.manage-column.column-number, .manage-column.column-mnemonic {
+    width: 80px;
+}

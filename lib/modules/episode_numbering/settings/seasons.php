@@ -150,7 +150,7 @@ class Seasons {
 
 	private function view_season() {
 
-		echo __( 'Season can help to organize your episodes.' );
+		echo __( 'Seasons can help to organize your episodes.' );
 
 		$table = new \Podlove\Modules\EpisodeNumbering\Season_List_Table();
 		$table->prepare_items();
@@ -188,8 +188,14 @@ class Seasons {
 				) );
 			}
 
-			$f->string( 'mnemonic', array(
-				'label'       => __( 'Mnemonic', 'podlove' ),
+			$f->string( 'title', array(
+				'label'       => __( 'Title', 'podlove' ),
+				'description' => __( '', 'podlove' ),
+				'html' => array( 'class' => 'regular-text required' )
+			) );
+
+			$f->string( 'subtitle', array(
+				'label'       => __( 'Subtitle', 'podlove' ),
 				'description' => __( '', 'podlove' ),
 				'html' => array( 'class' => 'regular-text required' )
 			) );
@@ -198,6 +204,20 @@ class Seasons {
 				'label'       => __( 'Description', 'podlove' ),
 				'description' => __( '', 'podlove' ),
 				'html'		  => array( 'rows' => 3, 'cols' => 40, 'class' => 'autogrow' )
+			) );
+
+			$f->image( 'cover', array(
+				'label'        => __( 'Cover Art URL', 'podlove' ),
+				'description'  => __( 'JPEG or PNG. At least 1400 x 1400 pixels.', 'podlove' ),
+				'html'         => array( 'class' => 'regular-text' ),
+				'image_width'  => 300,
+				'image_height' => 300
+			) );
+
+			$f->string( 'mnemonic', array(
+				'label'       => __( 'Mnemonic', 'podlove' ),
+				'description' => __( '', 'podlove' ),
+				'html' => array( 'class' => 'regular-text required' )
 			) );
 
 		});

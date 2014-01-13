@@ -45,11 +45,6 @@ class Episode_Numbering extends \Podlove\Modules\Base {
     public function was_activated( $module_name )
     {
     	Season::build();
-
-        // Add Season 1. This season will always exist and cannot be deleted.
-        $season1 = new \Podlove\Modules\EpisodeNumbering\Model\Season;
-        $season1->number = '1';
-        $season1->save();
     }
 
     public function episode_form_extension( $wrapper )
@@ -95,6 +90,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                         var podcast_mnemonic = "<?php echo $podcast->mnemonic; ?>";
                     </script>
 
+                    <?php if( count( $seasons ) > 0 ) : ?>
                     <div class="podlove-episode-numbering-item">
                         <label for="_podlove_meta_podlove_episode_season episode_season">Season</label>
                         <select name="_podlove_meta[_podlove_episode_season]" id="_podlove_meta_podlove_episode_season" class="chosen" >
@@ -115,6 +111,7 @@ class Episode_Numbering extends \Podlove\Modules\Base {
                         <label for="_podlove_meta_podlove_episode_number">Episode Number</label>
                         <input type="number" min="1" step="1" pattern="\d+" name="_podlove_meta[_podlove_episode_number]" id="_podlove_meta_podlove_episode_number" value="<?php echo ( $episode_number == '' ? $current_season_episode_counter + 1 : $episode_number ); ?>" >
                     </div>
+                    <?php endif; ?>
 
                     <div class="podlove-episode-numbering-item episode_global_number">
                         <label for="_podlove_meta_podlove_episode_global_number">Global Episode Number</label>

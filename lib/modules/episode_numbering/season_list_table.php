@@ -14,19 +14,31 @@ class Season_List_Table extends \Podlove\List_Table {
 		) );
 	}
 	
-
 	public function column_number( $season ) {
 		$actions = array(
-			'edit'   => Settings\Seasons::get_action_link( $season, __( 'Edit', 'podlove' ) ),	
+			'edit'   => Settings\Seasons::get_action_link( $season, __( 'Edit', 'podlove' ) ),
+			'delete' => Settings\Seasons::get_action_link( $season, __( 'Delete', 'podlove' ), 'confirm_delete' )
 		);
-
-		if( $season->number !== '1' )
-			$actions['delete'] = Settings\Seasons::get_action_link( $season, __( 'Delete', 'podlove' ), 'confirm_delete' );
 	
 		return sprintf( '%1$s %2$s',
 		    Settings\Seasons::get_action_link( $season, $season->number ),
 		    $this->row_actions( $actions )
 		) . '<input type="hidden" class="season_id" value="' . $season->id . '">';
+	}
+
+	public function column_cover( $season ) {
+		if( !$season->cover )
+			return;
+
+		return '<img src="' . $season->cover . '" alt="' . $season->title . '" class="podlove-episode-numbering-table-cover" />';
+	}
+
+	public function column_title( $season ) {
+		return $season->title;
+	}
+
+	public function column_subtitle( $season ) {
+		return $season->subtitle;
 	}
 
 	public function column_mnemonic( $season ) {
@@ -39,9 +51,12 @@ class Season_List_Table extends \Podlove\List_Table {
 
 	public function get_columns(){
 		$columns = array(
+			'cover' => __( '', 'podlove' ),
 			'number' => __( 'Number', 'podlove' ),
-			'mnemonic'  => __( 'Mnemonic', 'podlove' ),
+			'title'  => __( 'Title', 'podlove' ),
+			'subtitle'  => __( 'Subtitle', 'podlove' ),
 			'description'  => __( 'Description', 'podlove' ),
+			'mnemonic'  => __( 'Mnemonic', 'podlove' )
 		);
 		return $columns;
 	}
