@@ -11,18 +11,27 @@ class Categories extends \Podlove\Modules\Base {
 	public function load() {
 		add_filter( 'podlove_post_type_args', function ( $args ) {
 			$args['taxonomies'][] = 'category';
-			return $args;		
+			return $args;
 		} );
 
 		add_action( 'category_edit_form_fields', array( $this, 'category_edit_form_fields' ) );
 		add_action( 'edited_category', array( $this, 'save_category_extra_fields' ) );
 
-		add_filter( 'the_category_rss', array( $this, 'feed_modification' ) );
-	}
+		add_filter( 'podlove_manipulate_feed_title', function( $feed_title ) {
+			return "asd";
+		});
 
-	public function feed_modification( $bloginfo_rss ) {
-		print_r($bloginfo_rss);
-		return $bloginfo_rss;
+		add_filter( 'podlove_manipulate_feed_description', function( $feed_summary ) {
+			return "ololol";
+		});
+
+		add_filter( 'podlove_feed_itunes_subtitle', function( $foo ) {
+			return "<itunes:subtitle>FOOO</itunes:subtitle>";
+		});
+
+		add_filter( 'podlove_feed_itunes_summary', function( $foo ) {
+			return "<itunes:summary>FOOO</itunes:summary>";
+		});
 	}
 
 	public function category_edit_form_fields() {
