@@ -60,6 +60,14 @@ class Categories extends \Podlove\Modules\Base {
 
 			return "<itunes:summary>" . $overwrite_options['feed_summary'] . "</itunes:summary>";
 		});
+		add_filter( 'podlove_feed_itunes_image', function( $feed_image ) {
+			$overwrite_options = Categories::get_overwrite_options();
+
+			if ( empty( $overwrite_options['feed_image'] ) )
+				return $feed_image;
+
+			return "<itunes:image>" . $overwrite_options['feed_image'] . "</itunes:image>";
+		});
 	}
 
 	public static function get_overwrite_options() {
@@ -87,6 +95,7 @@ class Categories extends \Podlove\Modules\Base {
 
 	public function category_edit_form_fields() {
 		$podlove_feed_extension = get_option( 'podlove_category_extension_' . $_REQUEST['tag_ID'] );
+		$podcast = \Podlove\Model\Podcast::get_instance();
 		?>
 		<tr class="form-field">
 			<th valign="top" scope="row">
@@ -112,6 +121,26 @@ class Categories extends \Podlove\Modules\Base {
 			</th>
 			<td>
 				<textarea class="autogrow" cols="40" rows="3" name="podlove[feed_summary]"><?php echo ( isset( $podlove_feed_extension['feed_summary'] ) ? $podlove_feed_extension['feed_summary'] : '' ); ?></textarea>
+			</td>
+		</tr>
+		<tr class="form-field">
+			<th valign="top" scope="row">
+				<label for="catpic"><?php _e( 'Category Feed Image', 'podlove' ); ?></label>
+			</th>
+			<td>
+				<div>
+					<input type="text" name="podlove[feed_image]" id="podlove_podcast_cover_image" value="<?php echo ( isset( $podlove_feed_extension['feed_image'] ) ? $podlove_feed_extension['feed_image'] : $podcast->cover_image ); ?>" class="regular-text" />
+					<br />
+					<img src="<?php echo ( isset( $podlove_feed_extension['feed_image'] ) ? $podlove_feed_extension['feed_image'] : $podcast->cover_image ); ?>"  width="150" height="150" />
+				</div>
+				<script type="text/javascript">
+				(function($) {
+					$("#podlove_podcast_cover_image").on( 'change', function() {
+						url = $(this).val();
+						$(this).parent().find("img").attr("src", url);
+					} );
+				})(jQuery);
+				</script>
 			</td>
 		</tr>
 		<?php
