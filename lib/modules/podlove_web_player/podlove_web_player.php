@@ -11,9 +11,13 @@ class Podlove_Web_Player extends \Podlove\Modules\Base {
 
 	public function load() {
 
+		require_once 'lib/podlove-web-player/index.php';
+
 		add_action( 'podlove_dashboard_meta_boxes', array( $this, 'register_meta_boxes' ) );
 		add_filter( 'the_content', array( $this, 'autoinsert_into_content' ) );
-		add_action('wp', array( $this, 'standalone_player_page' ) );
+
+		add_action('wp_footer', 'PodloveWebPlayer::playerFooter' );
+		add_action('wp_head', 'PodloveWebPlayer::playerHeader' );
 
 		if ( defined( 'PODLOVEWEBPLAYER_DIR' ) ) {
 			define( 'PODLOVE_MEDIA_PLAYER', 'external' );
@@ -21,38 +25,6 @@ class Podlove_Web_Player extends \Podlove\Modules\Base {
 		} else {
 			define( 'PODLOVE_MEDIA_PLAYER', 'internal' );
 		}
-
-		include_once 'player/podlove-web-player/podlove-web-player.php';
-	}
-
-	public function standalone_player_page() {
-
-		if (!isset($_GET['standalonePlayer']))
-			return;
-
-		if (!is_single())
-			return;
-
-		if (!$episode = Episode::find_or_create_by_post_id(get_the_ID()))
-			return;
-
-		?>
-<!DOCTYPE html>
-    <head>
-        <script type="text/javascript" src="<?php echo $this->get_module_url() ?>/js/html5shiv.js"></script>
-        <script type="text/javascript" src="<?php echo $this->get_module_url() ?>/js/jquery-1.9.1.min.js"></script>
-        <script type="text/javascript" src="<?php echo $this->get_module_url() ?>/player/podlove-web-player/static/podlove-web-player.js"></script>
-        <link rel="stylesheet" href="<?php echo $this->get_module_url() ?>/player/podlove-web-player/static/podlove-web-player.css" />
-    </head>
-    <body>
-	    <?php
-	    $printer = new Printer($episode);
-	    echo $printer->render();
-	    ?>
-    </body>
-</html>
-		<?php
-		exit;
 	}
 
 	public function autoinsert_into_content( $content ) {
