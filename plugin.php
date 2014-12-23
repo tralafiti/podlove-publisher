@@ -65,7 +65,7 @@ function activate_for_current_blog() {
 	$podcast->save();
 
 	// set default modules
-	$default_modules = array( 'podlove_web_player', 'open_graph', 'asset_validation', 'logging', 'oembed', 'feed_validation', 'import_export' );
+	$default_modules = array( 'podlove_web_player', 'open_graph', 'asset_validation', 'logging', 'oembed', 'feed_validation', 'import_export', 'subscribe_button' );
 	foreach ( $default_modules as $module ) {
 		\Podlove\Modules\Base::activate( $module );
 	}
@@ -150,12 +150,13 @@ function activate($network_wide) {
  *
  * flush_rewrite_rules() is expensive, so it should only be called once.
  * However, calling it on activaton doesn't work. So I add a temporary flag
- * and call it when the flag exists. Not pretty but it does the job.
+ * and call it when the flag exists. Transient is also used in other places
+ * where rules must be rewritten.
  */
 add_action( 'admin_init', function () {
 	if ( delete_transient( 'podlove_needs_to_flush_rewrite_rules' ) )
 		flush_rewrite_rules();
-} );
+}, 100 );
 
 function deactivate() {
 	flush_rewrite_rules();
@@ -206,9 +207,11 @@ function uninstall_for_current_blog() {
  */
 add_action( 'init', array( '\Podlove\Custom_Guid', 'init' ) );
 add_action( 'init', array( '\Podlove\Geo_Ip', 'init' ) );
+add_action( 'init', array( '\Podlove\DuplicatePost', 'init' ) );
 
 add_action( 'admin_init', array( '\Podlove\Repair', 'init' ) );
 add_action( 'admin_init', array( '\Podlove\DeleteHeadRequests', 'init' ) );
+add_action( 'admin_init', array( '\Podlove\PhpDeprecationWarning', 'init' ) );
 
 // init cache (after plugins_loaded, so modules have a chance to hook)
 add_action( 'init', array( '\Podlove\Cache\TemplateCache', 'get_instance' ) );
@@ -389,11 +392,9 @@ add_action( 'update_option_permalink_structure', '\Podlove\run_system_report' );
 add_action( 'update_option_podlove', '\Podlove\run_system_report' );
 
 /**
- * Simple method to allow support for multiple urls per post.
- *
- * Add custom post meta 'podlove_alternate_url' with old url part to match.
+ * Handle configured redirects
  */
-function override404() {
+function handle_user_redirects() {
 	global $wpdb, $wp_query;
 
 	if ( is_admin() )
@@ -405,7 +406,9 @@ function override404() {
 	if ( isset( $parsed_request['query'] ) )
 		$parsed_request_url .= "?" . $parsed_request['query'];
 
-	foreach ( \Podlove\get_setting( 'redirects', 'podlove_setting_redirect' ) as $redirect ) {
+	$redirects = \Podlove\get_setting( 'redirects', 'podlove_setting_redirect' );
+
+	foreach ( $redirects as $index => $redirect ) {
 
 		if ( ! isset( $redirect['active'] ) )
 			continue;
@@ -414,8 +417,8 @@ function override404() {
 			continue;
 
 		$parsed_url = parse_url($redirect['from']);
-		
 		$parsed_redirect_url = $parsed_url['path'];
+
 		if ( isset( $parsed_url['query'] ) )
 			$parsed_redirect_url .= "?" . $parsed_url['query'];
 
@@ -432,12 +435,29 @@ function override404() {
 				$http_code = 302;
 			}
 
+			// increment redirection counter
+			$redirects[$index]['count'] += 1;
+			\Podlove\save_setting( 'redirects', 'podlove_setting_redirect', $redirects );
+
+			// redirect
 			status_header( $http_code );
 			$wp_query->is_404 = false;
 			\wp_redirect( $redirect['to'], $http_code );
 			exit;
 		}
 	}
+}
+
+/**
+ * Simple method to allow support for multiple urls per post.
+ *
+ * Add custom post meta 'podlove_alternate_url' with old url part to match.
+ */
+function handle_episode_redirects($value='') {
+	global $wpdb, $wp_query;
+
+	if ( is_admin() )
+		return;
 
 	if ( ! $wp_query->is_404 )
 		return;
@@ -461,10 +481,10 @@ function override404() {
 			exit;
 		}
 	}
-
 }
-add_filter( 'template_redirect', '\Podlove\override404' );
 
+add_filter( 'template_redirect', '\Podlove\handle_user_redirects' );
+add_filter( 'template_redirect', '\Podlove\handle_episode_redirects' );
 
 function clear_all_caches() {
 
@@ -627,7 +647,7 @@ function podcast_permalink_proxy($query_vars) {
 	}
 
 	// No post request
-	if ( isset( $query_vars["preview"] ) || false == ( isset( $query_vars["name"] ) || isset( $query_vars["p"] ) ) )
+	if ( isset( $query_vars["preview"] ) || false === ( isset( $query_vars["name"] ) || isset( $query_vars["p"] ) ) )
 		return $query_vars;
 	
 	if ( ! isset( $query_vars["post_type"] ) || $query_vars["post_type"] == "post" )
@@ -647,7 +667,7 @@ function remove_trash_posts_from_the_posts($posts, $wp_query) {
 		return $posts;
 
 	// No post request
-	if ( isset( $wp_query->query["preview"] ) || false == ( isset( $wp_query->query["name"] ) || isset( $wp_query->query["p"] ) ) )
+	if ( isset( $wp_query->query["preview"] ) || false === ( isset( $wp_query->query["name"] ) || isset( $wp_query->query["p"] ) ) )
 		return $posts;
 
 	// Only check if we found more than 2 posts
@@ -844,10 +864,6 @@ add_filter('pre_update_option_podlove_asset_assignment', function($new, $old) {
 }, 10, 2);
 
 function handle_media_file_download() {
-	
-	// don't count HEAD requests
-	if (strtoupper($_SERVER['REQUEST_METHOD']) === 'HEAD')
-		return;
 
 	if (isset($_GET['download_media_file'])) {
 		$download_media_file = $_GET['download_media_file'];
@@ -912,7 +928,7 @@ function handle_media_file_download() {
 		exit;
 	}
 
-	if (\Podlove\get_setting('tracking', 'mode') === "ptm_analytics") {
+	if (\Podlove\get_setting('tracking', 'mode') === "ptm_analytics" && strtoupper($_SERVER['REQUEST_METHOD']) !== 'HEAD') {
 		$intent = new Model\DownloadIntent;
 		$intent->media_file_id = $media_file_id;
 		$intent->accessed_at = date('Y-m-d H:i:s');
@@ -940,11 +956,16 @@ function handle_media_file_download() {
 			$intent->httprange = $_SERVER['HTTP_RANGE'];
 
 		// get ip, but don't store it
-		$ip = IP\Address::factory($_SERVER['REMOTE_ADDR']);
-		if (method_exists($ip, 'as_IPv6_address')) {
-			$ip = $ip->as_IPv6_address();
+		$ip_string = $_SERVER['REMOTE_ADDR'];
+		try {
+			$ip = IP\Address::factory($_SERVER['REMOTE_ADDR']);
+			if (method_exists($ip, 'as_IPv6_address')) {
+				$ip = $ip->as_IPv6_address();
+			}
+			$ip_string = $ip->format(IP\Address::FORMAT_COMPACT);
+		} catch (\InvalidArgumentException $e) {
+			\Podlove\Log::get()->addWarning( 'Could not use IP "' . $_SERVER['REMOTE_ADDR'] . '"' . $e->getMessage() );
 		}
-		$ip_string = $ip->format(IP\Address::FORMAT_COMPACT);
 
 		// Generate a hash from IP address and UserAgent so we can identify
 		// identical requests without storing an IP address.

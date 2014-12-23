@@ -46,8 +46,9 @@ add_action( 'init', function() {
 		add_feed( $feed->slug,  "\Podlove\Feeds\generate_podcast_feed" );
 	}
 
+	// changing feed settings may affect permalinks, so we need to flush
 	if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'podlove_feeds_settings_handle' ) {
-		flush_rewrite_rules();
+		set_transient( 'podlove_needs_to_flush_rewrite_rules', true );
 	}
 
 } );
@@ -91,7 +92,7 @@ function check_for_and_do_compression()
 	// if zlib output compression is already active, don't gzip
 	// (both cannot be active at the same time)
 	$ob_status = ob_get_status();
-	if ($ob_status['name'] == 'zlib output compression') {
+	if (isset($ob_status['name']) && $ob_status['name'] == 'zlib output compression') {
 		return false;
 	}
 

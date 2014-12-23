@@ -3,7 +3,7 @@ Contributors: eteubert, chemiker
 Donate link: http://flattr.com/thing/728463/Podlove-Podcasting-Plugin-for-WordPress
 Tags: podlove, podcast, publishing, blubrry, podpress, powerpress, feed, audio, video, player
 Requires at least: 3.0
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: trunk
 License: MIT
 
@@ -84,6 +84,89 @@ Find the setting Flattr > Advanced Settings > Flattrable content > Post Types an
 1. Click Activate Plugin to activate it.
 
 == Changelog ==
+
+= 1.12.1 =
+
+* fix: catch failed IP categorizations
+* fix: solve PHP notice
+* add custom icon to close template fullscreen mode
+* add custom contributor css to look nicely in twentyfifteen theme
+
+= 1.12 =
+
+- enable some WordPress template tags in Twig Templates: `is_archive()`, `is_post_type_archive()`, `is_attachment()`, `is_tax()`, `is_date()`, `is_day()`, `is_feed()`, `is_comment_feed()`, `is_front_page()`, `is_home()`, `is_month()`, `is_page()`, `is_paged()`, `is_preview()`, `is_search()`, `is_single()`, `is_singular()`, `is_time()`, `is_year()`, `is_404()`, `is_main_query()`
+- enable episode filtering by category slug: `podcast.episodes({category: "kitten"})`
+- redesigned template editor interface
+- fix feed cache issue which lead to enclosure URL mixups
+- display PHP deprecation warning aggressively for everyone below 5.4
+
+= 1.11.2 =
+
+- Cache feed items. This drastically reduces load when no feed proxy is used; especially in a "full feed" with many episodes.
+- Add Luxembourgish to languages
+
+= 1.11.1 =
+
+Subscribe Button fixes & enhancements:
+
+- don't pass undiscoverable feeds to the button
+- don't show a button if no feed is available
+- change defaults to "big-logo" and "autowidth"
+- fix issue with internal format
+
+= 1.11 =
+
+Say hello to the **Podlove Subscribe button**, the *Universal button to subscribe to buttons in the desired podcast client or player website*. It ships as a widget, so you can easily display it on your site. For more finegrained positioning, you can use the `[podlove-subscribe-button]` shortcode.
+
+More info on those sites:
+
+* Homepage: http://podlove.org/podlove-subscribe-button/
+* Help Translate: http://translate.podlove.org
+* GitHub: https://github.com/podlove/podlove-subscribe-button
+
+**Other Changes**
+
+* fix `contributor.episodes`: only show published episodes
+* fix redirect form: remove url validation
+* fix HEAD requests for download URLs
+* redirects are counted and displayed in the redirect settings
+
+= 1.10.23 =
+
+**Bugfixes**
+
+* fix social repair module
+* empty rss feeds now render properly
+* fix issue of randomly breaking URLs
+* fix missing files when using auto-publish feature by automatically validating files before publishing
+* fix "open" link for last contributor donations item
+* fix javascript error in license ui
+
+**New Features**
+
+* add basic client-side input validation to avoid typing errors: Leading and trailing whitespace will be removed automatically. URL and email fields are automatically syntax checked.
+* add support for scientific networks: ResearchGate, ORCiD, Scopus
+* add explicit support dor "Duplicate Post" plugin: duplicated episodes now regenerate GUIDs and contributions are copied, too
+
+**Enhancements & Others**
+
+* contributors form:
+  * switch public name and real name fields
+  * remove public email field (see deprecations)
+  * move contact email field to general section
+* ADN module: add option to not fall back on episode cover when no episode image is present
+* adjust Bitlove script so it plays well with https sites
+* include date in tracking export filename
+* move web player settings to expert settings
+* public contributor emails are handled by the social module now, instead of being a contributor attribute
+
+**Deprecations & Migration**
+
+If you are using `{{ contributor.publicemail }}` in your templates, you should change it to something like the following:
+
+	{% for service in contributor.services({type: "email"}) %}
+		<a target="_blank" href="{{ service.profileUrl }}">{{ service.rawValue }}</a>
+	{% endfor %}
 
 = 1.10.22 =
 
@@ -300,7 +383,7 @@ If you're of the curious type, feel free to activate it and tell us any issues y
 = 1.10.7 =
 
 * Feature: Direct episode access in templates via `{{ podcast.episodes({slug: 'pod001'}).title }}`
-* Feature: Episodes in templates can be filtered and ordered, for example `{{ podcast.episodes({orderby: 'title', 'order': 'ASC'}) }}`. For details, see [`podcast.episodes` documentation](http://docs.podlove.org/publisher/template-reference/#podcast)
+* Feature: Episodes in templates can be filtered and ordered, for example `{{ podcast.episodes({orderby: 'title', 'order': 'ASC'}) }}`. For details, see [`podcast.episodes` documentation](http://docs.podlove.org/ref/template-tags.html#podcast)
 * Feature: Direct contributor access in templates via `{{ podcast.contributors({id: 'john'}).name }}`
 * Feature: Add shortcode `[podlove-podcast-social-media-list]`, which lists all social media accounts for the podcast
 * Feature: Add shortcode `[podlove-podcast-donations-list]`, which lists all donation accounts for the podcast
@@ -392,7 +475,7 @@ __DEPRECATIONS/WARNINGS__
 
 **All-new, mighty Templating system**
 
-You can now use the [Twig Template Syntax](http://twig.sensiolabs.org/documentation) in all templates. Access all podcast/episode data via the new template API. Please read the [Template Guide](http://docs.podlove.org/guides/understanding-templates/) to get started.
+You can now use the [Twig Template Syntax](http://twig.sensiolabs.org/documentation) in all templates. Access all podcast/episode data via the new template API. Please read the [Template Guide](http://docs.podlove.org/tut/understanding-templates.html) to get started.
 
 If you have used templates before, please note that some shortcodes are now _DEPRECATED_. That means they still work but will be removed at some point. Following is a list of affected shortcodes and their replacements:
 
@@ -402,9 +485,9 @@ Instead of `[podlove-podcast-license]`, write `{{ podcast.license.html }}`.
 
 Instead of `[podlove-episode-license]`, write `{{ episode.license.html }}`.
 
-Instead of `[podlove-episode field="subtitle"]`, write `{{ episode.subtitle }}`. Instead of `[podlove-episode field="summary"]`, write `{{ episode.summary }}` etc. When in doubt, look at the [Episode Template Reference](http://docs.podlove.org/publisher/template-reference/#episode).
+Instead of `[podlove-episode field="subtitle"]`, write `{{ episode.subtitle }}`. Instead of `[podlove-episode field="summary"]`, write `{{ episode.summary }}` etc. When in doubt, look at the [Episode Template Reference](http://docs.podlove.org/ref/template-tags.html#episode).
 
-Changing the podcast data shortcodes works exactly the same: Instead of `[podlove-podcast field="title"]`, write `{{ podcast.title }}` etc. When in doubt, look at the [Podcast Template Reference](http://docs.podlove.org/publisher/template-reference/#podcast).
+Changing the podcast data shortcodes works exactly the same: Instead of `[podlove-podcast field="title"]`, write `{{ podcast.title }}` etc. When in doubt, look at the [Podcast Template Reference](http://docs.podlove.org/ref/template-tags.html#podcast).
 
 **Other Changes**
 
@@ -507,7 +590,7 @@ Changing the podcast data shortcodes works exactly the same: Instead of `[podlov
 
 **New Module: Contributors**
 
-Podcasts are not possible without their active communities. Huge contributions are being made behind the scenes and nobody notices except the podcaster. The contributors module shines light on all those diligent people. It's now easy to manage contributors of an episode and list them on the blog. The list contains references to their social profiles and the donation service Flattr. Shortcode to display them in an episode post: [`[podlove-contributor-list]`](http://docs.podlove.org/publisher/shortcodes/#contributors).
+Podcasts are not possible without their active communities. Huge contributions are being made behind the scenes and nobody notices except the podcaster. The contributors module shines light on all those diligent people. It's now easy to manage contributors of an episode and list them on the blog. The list contains references to their social profiles and the donation service Flattr. Shortcode to display them in an episode post: [`[podlove-contributor-list]`](http://docs.podlove.org/ref/template-tags.html#contributors).
 
 **Simple Protected Feeds**
 

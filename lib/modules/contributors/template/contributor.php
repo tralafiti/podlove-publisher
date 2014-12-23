@@ -144,6 +144,7 @@ class Contributor extends Wrapper {
 	/**
 	 * Email address for public use
 	 * 
+	 * @deprecated since 1.10.23, use social module instead
 	 * @accessor
 	 */
 	public function publicemail() {
@@ -203,6 +204,7 @@ class Contributor extends Wrapper {
 				INNER JOIN ' . $wpdb->posts . ' p ON p.ID = e.post_id
 			WHERE
 				ec.contributor_id = %d
+				AND p.post_status = "publish"
 			GROUP BY
 				ec.episode_id
 			ORDER BY

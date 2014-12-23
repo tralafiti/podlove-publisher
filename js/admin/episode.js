@@ -48,7 +48,7 @@ var PODLOVE = PODLOVE || {};
 
 	 	function create_file(args) {
 	 		var data = {
-	 			action: 'podlove-create-file',
+	 			action: 'podlove-file-create',
 	 			episode_id: args.episode_id,
 	 			episode_asset_id: args.episode_asset_id,
 	 			slug: $("#_podlove_meta_slug").val()
@@ -186,6 +186,7 @@ var PODLOVE = PODLOVE || {};
  		};
 
  		$.subscribe("/auphonic/production/status/done", update_all_media_files);
+ 		$.subscribe("/auphonic/production/status/results_imported", update_all_media_files);
  		$(document).on("click", "#update_all_media_files", update_all_media_files);
 
  		$(document).on("click", ".update_media_file", function(e) {
@@ -195,7 +196,7 @@ var PODLOVE = PODLOVE || {};
  			var file = container.find("input").data();
 
  			var data = {
- 				action: 'podlove-update-file',
+ 				action: 'podlove-file-update',
  				file_id: file.id,
  				slug: $("#_podlove_meta_slug").val()
  			};
