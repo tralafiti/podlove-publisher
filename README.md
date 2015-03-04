@@ -15,10 +15,11 @@ This is the podcast publishing plugin for WordPress.
 Code dependencies are managed via [Composer](http://getcomposer.org/). So you need to clone the repository and then fetch the dependencies via Composer.
 
 ```
-git clone --recursive git@github.com:<your-name-here>/podlove-publisher.git
+git clone git@github.com:<your-name-here>/podlove-publisher.git
 cd podlove-publisher
 curl -sS https://getcomposer.org/installer | php
 php composer.phar --dev install
+bower install
 ```
 
 ## Release Checklist
