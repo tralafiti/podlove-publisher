@@ -3,10 +3,7 @@ namespace Podlove\Modules\PodloveWebPlayer;
 
 class Player {
 
-	public $liburl;
-
 	function __construct() {
-		$liburl = '';
 		$this->assets = array();
 		$this->options = array(
 				'alwaysShowHours' => true,

@@ -31,64 +31,74 @@ class Printer {
 	}
 
 	public function render() {
-		$downloads = array();
-		$sources = array();
-
-		$chapters_raw = Parser\Mp4chaps::parse($this->episode->chapters);
-		$chapters = "";
-		if ($chapters_raw) {
-			$chapters_raw->setPrinter( new \Podlove\Chapters\Printer\JSON() );
-			$chapters = json_decode( (string) $chapters_raw );
-		}
-
-		foreach ($this->files as $file) {
-			$downloads[] = array(
-					'name' => $file['asset']->title,
-					'size' => $file['file']->size,
-					'url' => $file['file']->get_file_url(),
-					'dlurl' => $file['file']->get_file_url()
-				);
-			$sources[] = array(
-					'src' => $file['file']->get_file_url(),
-					'type' => $file['type']->mime_type
-				);
-		}
-
 		$player = new Player;
+		
 		// Configure Player
 		$player->options = array(
-				'sources' => $sources,
-				'downloads' => $downloads,
-				'chapters' => $chapters,
-
-				'poster' => $this->episode->get_cover_art(),
-				'title' => $this->post->post_title,
-				'permalink' => get_permalink(),
-				'subtitle' => $this->episode->subtitle,
-				'publicationDate' => date( 'c', strtotime($this->episode->recording_date) ),
-				'license' => array(
-						'name' => ( empty($this->episode->license_name) ? $this->podcast->license_name : $this->episode->license_name ),
-						'url' => ( empty($this->episode->license_url) ? $this->podcast->license_url : $this->episode->license_name )
-					),
-				'summary' => $this->episode->summary,
-				'show' => array(
-						'title' => $this->podcast->title,
-						'subtitle' => $this->podcast->subtitle,
-						'summary' => $this->podcast->summary,
-						'poster' => $this->podcast->cover_image,
-						'url' => get_home_url()
-					),
-				'duration' => $this->episode->duration,
-				'alwaysShowHours' => true,
-				'width' => 'auto',
-				'summaryVisible' => false,
-				'timecontrolsVisible' => false,
-				'sharebuttonsVisible' => false,
-				'chaptersVisible' => true
-			);
+			'sources' => $this->sources(),
+			'downloads' => $this->downloads(),
+			'chapters' => $this->chapters(),
+			'poster' => $this->episode->get_cover_art(),
+			'title' => $this->post->post_title,
+			'permalink' => get_permalink(),
+			'subtitle' => $this->episode->subtitle,
+			'publicationDate' => date( 'c', strtotime($this->episode->recording_date) ),
+			'license' => array(
+				'name' => ( empty($this->episode->license_name) ? $this->podcast->license_name : $this->episode->license_name ),
+				'url'  => ( empty($this->episode->license_url) ? $this->podcast->license_url : $this->episode->license_name )
+			),
+			'summary' => $this->episode->summary,
+			'show' => array(
+				'title' => $this->podcast->title,
+				'subtitle' => $this->podcast->subtitle,
+				'summary' => $this->podcast->summary,
+				'poster' => $this->podcast->cover_image,
+				'url' => get_home_url()
+			),
+			'duration' => $this->episode->duration,
+			'alwaysShowHours' => true,
+			'width' => 'auto',
+			'summaryVisible' => false,
+			'timecontrolsVisible' => false,
+			'sharebuttonsVisible' => false,
+			'chaptersVisible' => true
+		);
 
 		// And print it
 		return $player->getPlayer( get_permalink() );
+	}
+
+	private function chapters() {
+		$chapters_manager = new \Podlove\ChaptersManager($this->episode);
+		return json_decode($chapters_manager->get('json'));
+	}
+
+	private function downloads() {
+		$downloads = [];
+		
+		foreach ($this->files as $file) {
+			$downloads[] = [
+				'name'  => $file['asset']->title,
+				'size'  => $file['file']->size,
+				'url'   => $file['file']->get_file_url(),
+				'dlurl' => $file['file']->get_file_url()
+			];
+		}
+
+		return $downloads;
+	}
+
+	private function sources() {
+		$sources = [];
+
+		foreach ($this->files as $file) {
+			$sources[] = [
+				'src'  => $file['file']->get_file_url(),
+				'type' => $file['type']->mime_type
+			];
+		}
+
+		return $sources;
 	}
 
 	private function get_files() {
