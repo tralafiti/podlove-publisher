@@ -78,7 +78,6 @@ class Wprelease
 			 'podlove.sublime-project',
 			 'lib/modules/podlove_web_player/player/podlove-web-player/libs',
 			 'vendor/bin',
-			 'vendor/phpunit',
 			 'node_modules',
 			 'Gruntfile.js',
 			 'phpunit.xml',
