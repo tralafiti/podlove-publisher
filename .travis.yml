@@ -9,4 +9,4 @@ install:
 after_success:
   - make build
   - zip -r latest.zip dist
-  - curl --ftp-create-dirs -T $TRAVIS_REPO_SLUG/$TRAVIS_BRANCH/latest.zip -u $FTP_USER:$FTP_PASSWORD ftp://eric.co.de/files/
+  - curl --ftp-create-dirs -T latest.zip -u $FTP_USER:$FTP_PASSWORD ftp://eric.co.de/files/$TRAVIS_REPO_SLUG/$TRAVIS_BRANCH
