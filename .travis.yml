@@ -7,14 +7,13 @@ before_install:
 install:
   - composer install
 after_success:
-  - rm -r **/.git
-  - rm -r **/.gitignore
-  - rm -r **/.gitmodules
-  - rm -r lib/modules/podlove_web_player/player/podlove-web-player/libs
+  - find . -name "*.git*" | xargs rm -rf
+  - rm -rf lib/modules/podlove_web_player/player/podlove-web-player/libs
   - rm -r vendor/bin
-  - rm -r Rakefile
-  - rm -r README.md
-  - rm -r CONTRIBUTING.md
-  - rm -r **/composer.*
+  - rm Rakefile
+  - rm README.md
+  - rm CONTRIBUTING.md
+  - find . -name "*composer.json" | xargs rm -rf
+  - find . -name "*composer.lock" | xargs rm -rf
   - zip -r latest.zip .
   - curl --ftp-create-dirs -T latest.zip -u $FTP_USER:$FTP_PASSWORD ftp://eric.co.de/files/
