@@ -1,17 +1,17 @@
 build:
 	rm -r dist
 	mkdir dist
-	git clone --recursive --local . dist
-	curl -sS https://getcomposer.org/installer | php -- --install-dir=dist
-	cd dist && php composer.phar install
+	# move everything into dist
+	rsync -r --exclude=.git --exclude=dist . dist
 	# cleanup
-	rm -r dist/**/.git
-	rm -r dist/**/.gitignore
-	rm -r dist/**/.gitmodules
-	rm -r dist/lib/modules/podlove_web_player/player/podlove-web-player/libs
+	find dist -name "*.git*" | xargs rm -rf
+	rm -rf dist/lib/modules/podlove_web_player/player/podlove-web-player/libs
 	rm -r dist/vendor/bin
-	rm -r dist/Rakefile
-	rm -r dist/README.md
-	rm -r dist/CONTRIBUTING.md
-	rm -r dist/**/composer.*
+	rm dist/.travis.yml
+	rm dist/wprelease.yml
+	rm dist/Rakefile
+	rm dist/README.md
+	rm dist/CONTRIBUTING.md
+	find dist -name "*composer.json" | xargs rm -rf
+	find dist -name "*composer.lock" | xargs rm -rf
 
