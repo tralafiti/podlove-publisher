@@ -7,6 +7,9 @@ build:
 	find dist -name "*.git*" | xargs rm -rf
 	rm -rf dist/lib/modules/podlove_web_player/player/podlove-web-player/libs
 	rm -r dist/vendor/bin
+	rm -r dist/vendor/phpunit/php-code-coverage
+	rm -r dist/vendor/phpunit/phpunit
+	rm -r dist/vendor/phpunit/phpunit-mock-objects
 	rm dist/.travis.yml
 	rm dist/wprelease.yml
 	rm dist/Rakefile
