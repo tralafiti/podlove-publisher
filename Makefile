@@ -15,6 +15,7 @@ build:
 	rm -rf dist/vendor/twig/twig/test
 	rm -rf dist/vendor/guzzle/guzzle/tests
 	rm -f dist/.travis.yml
+	rm -rf dist/bin
 	rm -f dist/wprelease.yml
 	rm -f dist/CONTRIBUTING.md
 	rm -f dist/Makefile
