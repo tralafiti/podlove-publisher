@@ -23,7 +23,6 @@
         "pear/pear_exception": "1.0.*@dev",
         "pear/console_commandline": "dev-trunk",
         "podlove/comment-introspection": "dev-master",
-        "jdorn/sql-formatter": "1.3.*@dev",
         "phpunit/phpunit": "4.6.*"
     }
 }
