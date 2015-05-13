@@ -1,5 +1,5 @@
 build:
-	rm -r dist
+	rm -rf dist
 	mkdir dist
 	# move everything into dist
 	rsync -r --exclude=.git --exclude=dist . dist
@@ -8,12 +8,12 @@ build:
 	rm -rf dist/lib/modules/podlove_web_player/player/podlove-web-player/libs
 	rm -rf dist/lib/modules/podlove_web_player/player/podlove-web-player/img/banner-772x250.png
 	rm -rf dist/lib/modules/podlove_web_player/player/podlove-web-player/img/banner-1544x500.png
-	rm -r dist/vendor/bin
-	rm -r dist/vendor/phpunit/php-code-coverage
-	rm -r dist/vendor/phpunit/phpunit
-	rm -r dist/vendor/phpunit/phpunit-mock-objects
-	rm -r dist/vendor/twig/twig/test
-	rm -r dist/vendor/guzzle/guzzle/tests
+	rm -rf dist/vendor/bin
+	rm -rf dist/vendor/phpunit/php-code-coverage
+	rm -rf dist/vendor/phpunit/phpunit
+	rm -rf dist/vendor/phpunit/phpunit-mock-objects
+	rm -rf dist/vendor/twig/twig/test
+	rm -rf dist/vendor/guzzle/guzzle/tests
 	rm dist/.travis.yml
 	rm dist/wprelease.yml
 	rm dist/CONTRIBUTING.md
@@ -22,4 +22,3 @@ build:
 	rm dist/README.md
 	find dist -name "*composer.json" | xargs rm -rf
 	find dist -name "*composer.lock" | xargs rm -rf
-
