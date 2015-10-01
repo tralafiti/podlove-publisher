@@ -2,6 +2,7 @@
 namespace Podlove\Modules\SubscribeButton;
 
 use \Podlove\Model\Podcast;
+use \Mexitek\PHPColors\Color;
 
 /**
  * Podlove Subscribe Button
@@ -34,6 +35,8 @@ class Button {
 	}
 
 	public function render($args = []) {
+		$color = new Color('#FF3600');
+
 		$this->args = wp_parse_args($args, $this->defaults);
 
 		// whitelist size parameter

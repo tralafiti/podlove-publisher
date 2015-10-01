@@ -63,8 +63,8 @@
 		if (settings.deleteHandle) {
 			$this.on('click', settings.deleteHandle, function() {
 				var tr = $(this).closest("tr");
-				settings.onRowDelete.call(this, tr);
 				tr.remove();
+				settings.onRowDelete.call(this, tr);
 			});
 		}
 

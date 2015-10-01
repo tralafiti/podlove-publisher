@@ -70,33 +70,3 @@ add_filter('pre_update_option_podlove_asset_assignment', function($new, $old) {
 
 	return $new;
 }, 10, 2);
-
-// extend episode form
-add_filter('podlove_episode_form_data', function($form_data, $episode) {
-	
-	if ( Model\AssetAssignment::get_instance()->chapters !== 'manual' )
-		return $form_data;
-
-	$form_data[] = array(
-		'type' => 'text',
-		'key'  => 'chapters',
-		'options' => array(
-			'label'       => __( 'Chapter Marks', 'podlove' ),
-			'description' => __( 'One timepoint (hh:mm:ss[.mmm]) and the chapter title per line.', 'podlove' ),
-			'html'        => array(
-				'class'       => 'large-text code autogrow',
-				'placeholder' => '00:00:00.000 Intro',
-				'rows'        => max( 2, count( explode( "\n", $episode->chapters ) ) )
-			)
-		),
-		'position' => 800
-	);
-
-	return $form_data;
-}, 10, 2);
-
-add_filter('podlove_episode_data_filter', function ($filter) {
-	return array_merge($filter, [
-		'chapters'  => FILTER_UNSAFE_RAW
-	]);
-});

@@ -134,31 +134,31 @@ abstract class Base
 	}
 
 	public static function find_by_id( $id ) {
-		return self::find_one_by_sql(
+		return static::find_one_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' WHERE id = ' . (int) $id
 		);
 	}
 
 	public static function find_all_by_property( $property, $value ) {
-		return self::find_all_by_sql(
+		return static::find_all_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $property .  ' = \'' . esc_sql($value) . '\''
 		);
 	}
 
 	public static function find_one_by_property( $property, $value ) {
-		return self::find_one_by_sql(
+		return static::find_one_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $property .  ' = \'' . esc_sql($value) . '\' LIMIT 0,1'
 		);
 	}
 
 	public static function find_all_by_where( $where ) {
-		return self::find_all_by_sql(
+		return static::find_all_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $where
 		);
 	}
 	
 	public static function find_one_by_where( $where ) {
-		return self::find_one_by_sql(
+		return static::find_one_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' WHERE ' . $where . ' LIMIT 0,1'
 		);
 	}
@@ -196,13 +196,13 @@ abstract class Base
 	 * @return model object
 	 */
 	public static function first() {
-		return self::find_one_by_sql(
+		return static::find_one_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' LIMIT 0,1'
 		);
 	}
 	
 	public static function last() {
-		return self::find_one_by_sql(
+		return static::find_one_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' ORDER BY id DESC LIMIT 0,1'
 		);
 	}
@@ -214,7 +214,7 @@ abstract class Base
 	 * @return array list of model objects
 	 */
 	public static function all( $sql_suffix = '' ) {
-		return self::find_all_by_sql(
+		return static::find_all_by_sql(
 			'SELECT * FROM ' . static::table_name() . ' ' . $sql_suffix
 		);
 	}
