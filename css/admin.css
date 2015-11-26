@@ -302,15 +302,15 @@ label.podlove_cc_license_selector_label {
 	width: 100%;
 	border-bottom: 1px solid #999;
 }
-.media_file_table th {
+.media_file_table tr.media_file_row > th {
 	text-align: left;
 	border-bottom: 1px solid #999;
 }
-.media_file_table td {
+.media_file_table tr.media_file_row > td {
 	padding: 5px;
 	height: 24px;
 }
-.media_file_table tr:nth-child(even) {
+.media_file_table tr.media_file_row:nth-child(even) {
 	background: #EAEAEA;
 }
 

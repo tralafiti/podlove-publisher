@@ -25,9 +25,14 @@ class WordpressStorage implements StorageInterface {
 		return $options;
 	}
 
-	public function podlove_file_url($url, $podcast, $episode, $episode_asset, $file_type) {
+	public function podlove_file_url($url, $podcast, $episode, $asset, $file_type) {
 
-		$attachment_id = get_post_meta($episode->post_id, 'podlove_media_attachment_id', true);
+		$attachment_map = get_post_meta($episode->post_id, 'podlove_media_attachments', true);
+
+		if (!isset($attachment_map[$asset->id]) || !$attachment_map[$asset->id])
+			return '';
+
+		$attachment_id  = $attachment_map[$asset->id];
 		$url = wp_get_attachment_url($attachment_id);
 
 		return $url;

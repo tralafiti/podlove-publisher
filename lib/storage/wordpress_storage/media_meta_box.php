@@ -41,22 +41,29 @@ class MediaMetaBox {
 		if (!isset($_POST['_podlove_media']))
 			return;
 
-		$attachment_id = (int) $_POST['_podlove_media'];
-		$attachment_meta = wp_get_attachment_metadata($attachment_id);
+		$media_attachments = (array) $_POST['_podlove_media'];
+		update_post_meta($post_id, 'podlove_media_attachments', $media_attachments);
 
-		update_post_meta($post_id, 'podlove_media_attachment_id', $attachment_id);
-		$episode = Episode::find_or_create_by_post_id($post_id);
+		foreach ($media_attachments as $asset_id => $attachment_id) {
 
-		// @fixme: ensure it's the correct asset, not just any
-		$asset = EpisodeAsset::first();
-		if (!$file = MediaFile::find_by_episode_id_and_episode_asset_id($episode->id, $asset->id)) {
-			$file = new MediaFile;
-			$file->episode_id = $episode->id;
-			$file->episode_asset_id = $asset->id;
+			$attachment_meta = wp_get_attachment_metadata($attachment_id);
+			$episode = Episode::find_or_create_by_post_id($post_id);
+			$asset = EpisodeAsset::find_by_id($asset_id);
+
+			if (!$file = MediaFile::find_by_episode_id_and_episode_asset_id($episode->id, $asset->id)) {
+				$file = new MediaFile;
+				$file->episode_id = $episode->id;
+				$file->episode_asset_id = $asset->id;
+			}
+			
+			if ($attachment_meta) {
+				$file->size = $attachment_meta['filesize'];
+				$file->save();
+			} else {
+				$file->delete();
+			}
+			
 		}
-		
-		$file->size = $attachment_meta['filesize'];
-		$file->save();
 	}
 
 	public function meta_box_callback($post) {
@@ -66,59 +73,81 @@ class MediaMetaBox {
 		$podcast = Model\Podcast::get();
 		$episode = Model\Episode::find_or_create_by_post_id($post_id);
 
-		$attachment_id = get_post_meta($post_id, 'podlove_media_attachment_id', true);
-		$attachment = wp_prepare_attachment_for_js($attachment_id);
+		$attachment_map = get_post_meta($post_id, 'podlove_media_attachments', true);
+		if (!$attachment_map) {
+			$attachment_map = [];
+		}
 
+		$assets = Model\EpisodeAsset::all();
 		?>
 
-<div class="podlove_media_upload" <?php if ($attachment): ?>style="display:none"<?php endif ?>>
-	<button class="button" id="podlove_episode_media_upload_button">Add Episode Media</button>
-	<input type="hidden" value="<?php echo $attachment_id ?>" name="_podlove_media" id="podlove_episode_media_field" />
-</div>
-
-<div class="podlove_media_attachment" <?php if (!$attachment): ?>style="display:none"<?php endif ?>>
-	<div class="podlove-icon"></div>
-	<div class="podlove-meta">
-		<table>
-			<tr>
-				<th>Permalink</th>
-				<td><div class="podlove-permalink"></div></td>
-			</tr>
-			<tr>
-				<th>Size</th>
-				<td><div class="podlove-size"></div></td>
-			</tr>
-			<tr>
-				<th>Duration</th>
-				<td><div class="podlove-duration"></div></td>
-			</tr>
-		</table>
-	</div>
-</div>
-
 <script type="text/javascript">
-var podlove_media_attachment_data = <?php echo $attachment ? json_encode($attachment) : 'null' ?>;
+var podlove_media_attachment_data = {};
 </script>
+<table class="media_file_table" border="0" cellspacing="0">
+<thead>
+	<tr>
+		<th>Asset</th>
+		<th>URL</th>
+		<th>Size</th>
+		<th>Duration</th>
+		<th>Upload</th>
+	</tr>
+</thead>
+<tbody>
+<?php foreach ($assets as $asset): ?>
+	<?php
+	// get attachment for asset
+	$attachment_id = $attachment_map[$asset->id];
+	if ($attachment_id) {
+		$attachment = wp_prepare_attachment_for_js($attachment_id);
+	} else {
+		$attachment = [];
+	}
+	?>
+	<tr class="media_file_row podlove_storage_upload attachment-<?php echo $attachment['id'] ?>">
+		<td>
+			<?php echo $asset->title ? $asset->title : $asset->title() ?>
+		</td>
+		<td class="podlove-permalink">
+		<?php if ($attachment): ?>
+			<script type="text/javascript">
+			podlove_media_attachment_data[<?php echo $attachment['id'] ?>] = <?php echo $attachment ? json_encode($attachment) : 'null' ?>;
+			</script>
+		<?php endif ?>
+		</td>
+		<td class="podlove-size"></td>
+		<td class="podlove-duration"></td>
+		<td>
+			<div class="podlove_media_upload">
+				<button class="button podlove_episode_media_upload_button">Upload Media</button>
+				<input type="hidden" value="<?php echo $attachment['id'] ?>" class="podlove-media-field" name="_podlove_media[<?php echo $asset->id ?>]" />
+			</div>
+		</td>
+	</tr>
+<?php endforeach ?>
+</tbody>
+</table>
+
 
 <script type="text/javascript">
 (function($) {
 
+	var upload_button = null;
+
 	function render_attachment(attachment) {
-		var wrapper   = $(".podlove_media_attachment"),
+		var wrapper   = $(".media_file_row.attachment-" + attachment.id),
 			icon      = wrapper.find(".podlove-icon"),
 			permalink = wrapper.find(".podlove-permalink"),
 			size      = wrapper.find(".podlove-size"),
 			duration  = wrapper.find(".podlove-duration"),
-			upload    = $(".podlove_media_upload")
+			upload    = wrapper.find(".podlove_media_upload")
 		;
 
 		icon.html('<img src="' + attachment.image.src + '" />');
 		permalink.html('<a href="' + attachment.url + '">' + attachment.filename + '</a>');
 		size.html(attachment.filesizeHumanReadable);
 		duration.html(attachment.fileLength);
-
-		wrapper.show();
-		upload.hide();
 	}
 
 	function init_media_select() {
@@ -145,18 +174,26 @@ var podlove_media_attachment_data = <?php echo $attachment ? json_encode($attach
 		});
 
 		file_frame.states.add([library]);
-		file_frame.on('select update insert', function() {
+		file_frame.on('select update insert', function(e) {
 			var state      = file_frame.state(), 
 				attachment = state.get('selection').first().toJSON(),
-				value      = attachment.id
+				value      = attachment.id,
+				wrapper = upload_button.closest(".media_file_row"),
+				input = wrapper.find("input.podlove-media-field")
 				;
 
-			$("#podlove_episode_media_field").val(value);
+			// @todo: remove all classes starting with 'attachment-'
+
+			wrapper.addClass('attachment-' + attachment.id);
+
+			input.val(value);
+
 			render_attachment(attachment);
 		});
 
-		$("#podlove_episode_media_upload_button, .podlove-icon").on('click', function(e) {
+		$(".podlove_episode_media_upload_button").on('click', function(e) {
 			e.preventDefault();
+			upload_button = $(this);
 			file_frame.open();
 		});
 	}
@@ -165,7 +202,9 @@ var podlove_media_attachment_data = <?php echo $attachment ? json_encode($attach
 		init_media_select();
 
 		if (podlove_media_attachment_data) {
-			render_attachment(podlove_media_attachment_data);
+			$.each(podlove_media_attachment_data, function (attachment_id, attachment) {
+				render_attachment(podlove_media_attachment_data[attachment_id]);
+			});
 		};
 	});
 
@@ -173,39 +212,19 @@ var podlove_media_attachment_data = <?php echo $attachment ? json_encode($attach
 </script>
 
 <style type="text/css">
-#podlove_podcast_media {
-    background: transparent;
-    border: transparent;
-    padding: 0;
-    margin: 20px 0 0 0;
-}
-
-#podlove_podcast_media .handlediv,
-#podlove_podcast_media .ui-sortable-handle { display: none; }
-
+#advanced-sortables { margin-top: 20px; }
 .podlove_media_upload {
 	width: 100%;
-	border: 4px dashed #b4b9be;
-	background: #f1f1f1;
+	/*border: 4px dashed #b4b9be;*/
+	/*background: #f1f1f1;*/
 	text-align: center;
-	padding: 20px;
+	/*padding: 20px;*/
 	box-sizing: border-box;
 }
 
-.podlove_media_attachment .podlove-icon {
-	cursor: pointer;
-	float: left;
-	margin-right: 10px;
-	width: 64px;
-}
-
-.podlove_media_attachment .podlove-icon img {
-	max-width: 100%;
-	margin-top: 1px;
-}
-
-.podlove_media_attachment table th {
+.media_file_table th {
 	text-align: left;
+	padding-left: 5px;
 }
 </style>
 		<?php
