@@ -265,6 +265,8 @@ $(document).ready(function () {
 				$size = is_object($file) ? (int) $file->size : 0;
 				if ($size === 1) {
 					$size = "unknown";
+				} else {
+					$size = \Podlove\format_bytes($size);
 				}
 
 				$attributes = array(

@@ -129,7 +129,7 @@ var PODLOVE = PODLOVE || {};
 	 					$row.find(".status").html('<i class="podlove-icon-remove"></i>');
 	 				} else {
 	 					if (isNumber(size)) {
-		 					size_html = '<span style="color:#0a0b0b" title="' + readable_size + '">' + size + ' Bytes</span>';	
+		 					size_html = '<span style="color:#0a0b0b" title="' + size + ' bytes">' + readable_size + '</span>';	
 	 					} else {
 	 						size_html = '<span>' + size + '</span>';	
 	 					}
