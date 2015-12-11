@@ -151,8 +151,8 @@ class WebPlayer extends Tab {
 			'version'     => array(
 				'label'   => __( 'Player Version', 'podlove' ),
 				'options' => array(
-					'player_v2' => __( 'Podlove Web Player 2', 'podlove' ),
-					'player_v3' => __( 'Podlove Web Player 3 (unstable beta, don\'t use in production)', 'podlove' )
+					'player_v3' => __( 'Podlove Web Player 3', 'podlove' ),
+					'player_v2' => __( 'Podlove Web Player 2', 'podlove' )
 				)
 			)
 		);
