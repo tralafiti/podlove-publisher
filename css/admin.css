@@ -157,7 +157,7 @@ table.podlove_alternating tr:nth-child(even) {
 }
 
 .media_file_row .enable { width: 45px; }
-.media_file_row .size   { width: 130px; }
+.media_file_row .size   { width: 70px; }
 .media_file_row .update { width: 90px; }
 
 /* Episode */

@@ -90,7 +90,6 @@ var podlove_media_attachment_data = {};
 		<th>Asset</th>
 		<th>URL</th>
 		<th>Size</th>
-		<th>Duration</th>
 		<th>Upload</th>
 	</tr>
 </thead>
@@ -117,7 +116,6 @@ var podlove_media_attachment_data = {};
 		<?php endif ?>
 		</td>
 		<td class="podlove-size"></td>
-		<td class="podlove-duration"></td>
 		<td>
 			<div class="podlove_media_upload">
 				<button class="button podlove_episode_media_upload_button">Upload Media</button>
@@ -140,14 +138,12 @@ var podlove_media_attachment_data = {};
 			icon      = wrapper.find(".podlove-icon"),
 			permalink = wrapper.find(".podlove-permalink"),
 			size      = wrapper.find(".podlove-size"),
-			duration  = wrapper.find(".podlove-duration"),
 			upload    = wrapper.find(".podlove_media_upload")
 		;
 
 		icon.html('<img src="' + attachment.image.src + '" />');
 		permalink.html('<a href="' + attachment.url + '">' + attachment.filename + '</a>');
 		size.html(attachment.filesizeHumanReadable);
-		duration.html(attachment.fileLength);
 	}
 
 	function init_media_select() {
