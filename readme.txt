@@ -112,6 +112,50 @@ This product includes GeoLite2 data created by MaxMind, available from http://ww
 
 * when activating the plugin, add mp3 asset and feed to help users get over the most confusing part of the setup
 
+= 2.3.6 =
+
+**Bugfixes**
+
+* When creating a new contributor, social and donation services are saved correctly
+* Deleting a contributor shows the correct confirmation message
+
+**Enhancements**
+
+* Podlove Subscribe Button: When an iTunes id is known for a feed, the button does not just pass the feed URL to the client when iTunes or Podcasts App are chosen. It redirects the user to the iTunes directory first. Because if you don't do this, "[it] does not increase your visibility on the iTunes Store or allow you to earn commission as part of the Affiliate Program." (http://www.apple.com/itunes/podcasts/specs.html)
+* Detect and warn if an episode slug has been used before
+
+= 2.3.5 =
+
+Update Web Player v3
+
+* beta.6 https://github.com/podlove/podlove-web-player/releases/tag/v3.0.0-beta.6
+* rc.1 https://github.com/podlove/podlove-web-player/releases/tag/v3.0.0-rc.1
+* rc.2 https://github.com/podlove/podlove-web-player/releases/tag/v3.0.0-rc2
+* rc.3 https://github.com/podlove/podlove-web-player/releases/tag/v3.0.0-rc3
+
+= 2.3.4 =
+
+**Web Player (v3 Beta)**
+
+The new web player can be selected in `Expert Settings > Web Player`. Please try it out and send us your feedback. Thanks!
+
+* update player
+* add theme player options
+* fix player permalink parameter
+* fix player width on Mobile Safari
+
+**Other**
+
+* fix Auphonic workflow bug: when finishing a production, media files would sometimes erroneously be detected as not existing
+* detect when the configured Auphonic Preset does not exist
+* fix focus when adding new related episode rows
+* chosen search fields allow partial searches
+* enable Twig date extension to allow `time_diff` filter; see [Date Extension Documentation](http://twig.sensiolabs.org/doc/extensions/date.html)
+
+= 2.3.3 =
+
+Updating all the things for your pleasure.
+
 = 2.3.2 =
 
 * add template accessor `episode.post` to get WordPress post object
@@ -120,6 +164,8 @@ This product includes GeoLite2 data created by MaxMind, available from http://ww
 * fix: cache purge also deletes timeout entries
 * fix: cache purge affects downloads table
 * fix: JavaScript event for secondary download button
+* fix: default template assignment on plugin activation
+* fix: unpublished relates episodes do not appear when using the shortcode or template accessor
 
 = 2.3.1 =
 

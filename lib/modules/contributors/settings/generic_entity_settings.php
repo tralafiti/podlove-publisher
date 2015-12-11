@@ -104,6 +104,8 @@ class GenericEntitySettings {
 		$entity = new $class;
 		$entity->update_attributes( $_POST['podlove_' . $this->get_entity_slug()] );
 
+		do_action('podlove_create_entity_' . $this->get_entity_slug(), $entity);
+
 		if (isset($_POST['submit_and_stay'])) {
 			$this->redirect( 'edit', $entity->id );
 		} else {
@@ -129,11 +131,16 @@ class GenericEntitySettings {
 		if ( isset($_GET["action"]) AND $_GET["action"] == 'confirm_delete' AND isset( $_REQUEST[ $this->get_entity_slug() ] ) ) {
 			$class  = $this->get_entity_class();
 			$entity = $class::find_by_id( $_REQUEST[ $this->get_entity_slug() ] );
+
+			$title  = $entity->title;
+			if (!$title && method_exists($entity, 'getName')) {
+				$title = $entity->getName();
+			}
 			?>
 			<div class="updated">
 				<p>
 					<strong>
-						<?php echo sprintf($this->labels['delete_confirm'], $entity->title); ?>
+						<?php echo sprintf($this->labels['delete_confirm'], $title); ?>
 					</strong>
 				</p>
 				<p>
