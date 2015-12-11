@@ -172,8 +172,14 @@ function enhance_slug_field() {
 	slug
 		.css({width: '30px'})
 		.attr({autocorrect: 'off'})
-		.autoGrowInput({ minWidth: 30, maxWidth: 200, comfortZone: 30 })
+		.autoGrowInput({ minWidth: 30, comfortZone: 20 })
 		.blur();
+
+	window.addEventListener('resize', function() {
+		slug
+			.autoGrowInput({ minWidth: 30, comfortZone: 20 })
+			.blur();
+	});
 }
 
 $(document).ready(function () {
