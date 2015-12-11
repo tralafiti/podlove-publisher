@@ -52,15 +52,13 @@
 		var url;
 
 		if ($(".media_file_row").length) {
-			url = $(".media_file_row .url a")
+			url = $(".media_file_row .url a, .media_file_row .podlove-permalink a")
 				.map(function() {
 					return $(this).attr("href");
 				})
 				.filter(function() {
 					return this.match(/\.(mp3|m4a|ogg|oga|opus)$/);
 				})[0];
-		} else {
-			url = $(".podlove-permalink a").first().attr("href");
 		}
 
 		return url;
