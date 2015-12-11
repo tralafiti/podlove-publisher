@@ -141,6 +141,7 @@ var PODLOVE = PODLOVE || {};
 	 				$row.find(".update").html('<a href="#" class="button update_media_file">update</a>');
 
 	 				o.slug_field.trigger('mediaFileHasUpdated', [url]);
+	 				$.publish('/media/external/render_row');
 	 			}
 
 	 		} else {

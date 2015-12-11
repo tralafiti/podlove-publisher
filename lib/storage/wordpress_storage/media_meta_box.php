@@ -144,6 +144,8 @@ var podlove_media_attachment_data = {};
 		icon.html('<img src="' + attachment.image.src + '" />');
 		permalink.html('<a href="' + attachment.url + '">' + attachment.filename + '</a>');
 		size.html(attachment.filesizeHumanReadable);
+
+		$.publish('/media/wordpress/render_attachment', [attachment]);
 	}
 
 	function init_media_select() {

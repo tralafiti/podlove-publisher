@@ -64,6 +64,12 @@
 		return url;
 	};
 
+	var maybe_update_duration = function() {
+		if (!$("#_podlove_meta_duration").val()) {
+			$('#podlove_detect_duration').click();
+		}
+	};
+
 	$(document).ready(function() {
 
 		// inject detect-duration-button
@@ -71,5 +77,8 @@
 			.after(" <a href=\"#\" id=\"podlove_detect_duration\">detect duration</a> <span id=\"podlove_detect_duration_status\"></span>");
 
 		$("#podlove_podcast").on('click', '#podlove_detect_duration', detect_duration);
+
+		$.subscribe('/media/wordpress/render_attachment', maybe_update_duration);
+		$.subscribe('/media/external/render_row', maybe_update_duration);
 	});
 }(jQuery));
