@@ -300,7 +300,7 @@ label.podlove_cc_license_selector_label {
 
 .media_file_table {
 	width: 100%;
-	border-bottom: 1px solid #999;
+	/*border-bottom: 1px solid #999;*/
 }
 .media_file_table tr.media_file_row > th {
 	text-align: left;
