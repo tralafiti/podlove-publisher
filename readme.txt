@@ -112,6 +112,12 @@ This product includes GeoLite2 data created by MaxMind, available from http://ww
 
 * when activating the plugin, add mp3 asset and feed to help users get over the most confusing part of the setup
 
+= 2.3.7 = 
+
+**Bugfixes**
+
+* fix "add new" contributor button
+
 = 2.3.6 =
 
 **Bugfixes**
