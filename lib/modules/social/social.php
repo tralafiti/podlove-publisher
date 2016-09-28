@@ -119,6 +119,20 @@ class Social extends \Podlove\Modules\Base {
 		}
 	}
 
+	/**
+	 * Deletes all services by a contributor of the given type.
+	 * 
+	 * @param  Podlove\Modules\Contributors\Model\Contributor $contributor
+	 * @param  string $type        service type
+	 */
+	private function delete_services_by_contributor_and_type($contributor, $type) {
+		foreach (\Podlove\Modules\Social\Model\ContributorService::all("WHERE `contributor_id` = " . (int) $contributor->id) as $ContributorService) {
+			$service = \Podlove\Modules\Social\Model\Service::find_by_id($ContributorService->service_id);
+			if ( $service->category == $type )
+				$ContributorService->delete();
+		}		
+	}
+
 	public function save_contributor( $contributor ) {
 		if (!isset($_POST['podlove_contributor']) )
 			return;
@@ -126,27 +140,20 @@ class Social extends \Podlove\Modules\Base {
 		if (!isset($_POST['podlove_contributor']['services']) && !isset($_POST['podlove_contributor']['donations']))
 			return;
 
-		$delete_service = function ($type) use ($contributor) {
-			foreach (\Podlove\Modules\Social\Model\ContributorService::all("WHERE `contributor_id` = " . $contributor->id) as $ContributorService) {
-				$service = \Podlove\Modules\Social\Model\Service::find_by_id($ContributorService->service_id);
-				if ( $service->category == $type )
-					$ContributorService->delete();
-			}
-		};
-
 		foreach (array('donations', 'services') as $type) {
 			$position = 0;
 
 			if (isset($_POST['podlove_contributor'][$type]) ) {
-				$delete_service( ( $type == 'donations' ? 'donation' : 'social' ) );
+				$servicetype_to_delete = ( $type == 'donations' ? 'donation' : 'social' );
+				$this->delete_services_by_contributor_and_type($contributor, $servicetype_to_delete);
 				foreach ($_POST['podlove_contributor'][$type] as $service_appearance) {
 					foreach ($service_appearance as $service_id => $service) {
-						$c = new \Podlove\Modules\Social\Model\ContributorService;
-						$c->position = $position;
-						$c->contributor_id = $contributor->id;
-						$c->service_id = $service_id;
-						$c->value = $service['value'];
-						$c->title = $service['title'];
+						$c                 = new \Podlove\Modules\Social\Model\ContributorService;
+						$c->position       = (int) $position;
+						$c->contributor_id = (int) $contributor->id;
+						$c->service_id     = (int) $service_id;
+						$c->value          = $service['value'];
+						$c->title          = $service['title'];
 						$c->save();
 					}
 					$position++;
